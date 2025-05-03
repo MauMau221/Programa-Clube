@@ -84,36 +84,38 @@
           </thead>
           <tbody>
             <tr *ngFor="let produto of produtosFiltrados">
-              <td>{{ produto.id }}</td>
-              <td>{{ produto.nome }}</td>
+              <td>{{ produto.id || 'N/A' }}</td>
+              <td>{{ produto.nome || 'Sem nome' }}</td>
               <td>{{ produto.categoria?.nome || 'Sem categoria' }}</td>
-              <td class="text-end">{{ produto.preco ? 'R$ ' + produto.preco.toFixed(2) : 'Não definido' }}</td>
+              <td class="text-end">
+                <ng-container *ngIf="produto.preco !== undefined && produto.preco !== null">
+                  R$ {{ produto.preco.toFixed(2) }}
+                </ng-container>
+                <ng-container *ngIf="produto.preco === undefined || produto.preco === null">
+                  Não definido
+                </ng-container>
+              </td>
               <td class="text-center">
                 <i class="bi" [ngClass]="produto.status === 'disponivel' ? 'bi-check-circle-fill text-success' : (produto.status === 'indisponivel' ? 'bi-x-circle-fill text-danger' : 'bi-question-circle text-secondary')"></i>
               </td>
               <td class="text-center fw-bold" [ngClass]="getClasseEstoque(produto)">
-                {{ produto.quantidade_estoque !== undefined ? produto.quantidade_estoque : 'N/D' }}
+                {{ produto.quantidade_estoque !== undefined && produto.quantidade_estoque !== null ? produto.quantidade_estoque : 'N/D' }}
               </td>
               <td class="text-center">
-                {{ produto.estoque_minimo !== undefined ? produto.estoque_minimo : 'N/D' }}
+                {{ produto.estoque_minimo !== undefined && produto.estoque_minimo !== null ? produto.estoque_minimo : 'N/D' }}
               </td>
               <td class="text-center">
-                <span class="badge rounded-pill" [ngClass]="{
-                  'bg-danger': produto.quantidade_estoque === 0,
-                  'bg-warning text-dark': produto.quantidade_estoque !== undefined && produto.quantidade_estoque > 0 && produto.estoque_minimo !== undefined && produto.quantidade_estoque < produto.estoque_minimo,
-                  'bg-success': produto.quantidade_estoque !== undefined && produto.estoque_minimo !== undefined && produto.quantidade_estoque >= produto.estoque_minimo,
-                  'bg-secondary': produto.quantidade_estoque === undefined
-                }">
+                <span class="badge" [ngClass]="getClasseEstoque(produto)">
                   {{ getStatusEstoque(produto) }}
                 </span>
               </td>
               <td class="text-end">
-                <div class="btn-group">
-                  <a [routerLink]="['/estoque/movimentacao', produto.id]" class="btn btn-sm btn-primary" title="Movimentar estoque">
-                    <i class="bi bi-arrows-move"></i>
+                <div class="btn-group btn-group-sm">
+                  <a [routerLink]="['/estoque/movimentacao']" [queryParams]="{produto_id: produto.id}" class="btn btn-outline-primary" title="Adicionar movimentação">
+                    <i class="bi bi-arrow-down-up"></i>
                   </a>
-                  <a [routerLink]="['/estoque/historico', produto.id]" class="btn btn-sm btn-outline-secondary" title="Ver histórico">
-                    <i class="bi bi-clock-history"></i>
+                  <a [routerLink]="['/produtos/editar', produto.id]" class="btn btn-outline-secondary" title="Editar produto">
+                    <i class="bi bi-pencil"></i>
                   </a>
                 </div>
               </td>

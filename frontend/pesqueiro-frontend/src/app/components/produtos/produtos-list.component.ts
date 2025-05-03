@@ -32,7 +32,21 @@ export class ProdutosListComponent implements OnInit {
     this.isLoading = true;
     this.produtoService.getProdutos().subscribe({
       next: (produtos) => {
+        console.log('Resposta original produtos:', JSON.stringify(produtos));
         console.log('Produtos recebidos na listagem:', produtos);
+        
+        if (produtos.length > 0) {
+          const primeiroProduto = produtos[0];
+          console.log('Detalhes do primeiro produto:');
+          console.log('ID:', primeiroProduto.id);
+          console.log('Nome:', primeiroProduto.nome);
+          console.log('Preço:', primeiroProduto.preco, typeof primeiroProduto.preco);
+          console.log('Categoria ID:', primeiroProduto.categoria_id, typeof primeiroProduto.categoria_id);
+          console.log('Status:', primeiroProduto.status, typeof primeiroProduto.status);
+          console.log('Estoque mínimo:', primeiroProduto.estoque_minimo, typeof primeiroProduto.estoque_minimo);
+          console.log('Observação:', primeiroProduto.observacao, typeof primeiroProduto.observacao);
+          console.log('Todos os campos do produto:', Object.keys(primeiroProduto));
+        }
         
         // Garantir que todos os produtos tenham os campos necessários
         this.produtos = produtos.map(produto => {

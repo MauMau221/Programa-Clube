@@ -50,6 +50,7 @@
                   [ngClass]="{'is-invalid': produtoForm.get('preco')?.invalid && produtoForm.get('preco')?.touched}"
                   step="0.01"
                   min="0.01"
+                  [attr.placeholder]="isEditMode ? '' : 'Informe o preço'"
                 />
                 <div class="invalid-feedback" *ngIf="produtoForm.get('preco')?.errors?.['required'] && produtoForm.get('preco')?.touched">
                   Preço é obrigatório
@@ -58,6 +59,7 @@
                   Preço deve ser maior que zero
                 </div>
               </div>
+              <small class="form-text text-muted">Valor do produto em reais</small>
             </div>
 
             <div class="mb-3">
@@ -76,6 +78,7 @@
               <div class="invalid-feedback" *ngIf="produtoForm.get('categoria_id')?.errors?.['required'] && produtoForm.get('categoria_id')?.touched">
                 Categoria é obrigatória
               </div>
+              <small class="form-text text-muted">Selecione a categoria do produto</small>
             </div>
 
             <div class="mb-3">

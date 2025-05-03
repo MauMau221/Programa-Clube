@@ -56,13 +56,23 @@
     <div class="col-md-4 mb-4" *ngFor="let produto of produtosFiltrados">
       <div class="card h-100 shadow-sm produto-card" [class.indisponivel]="produto.status === 'indisponivel'">
         <div class="card-body">
-          <h5 class="card-title">{{ produto.nome }}</h5>
+          <h5 class="card-title">{{ produto.nome || 'Produto sem nome' }}</h5>
           <p class="card-text small text-muted">{{ produto.observacao || 'Sem observações' }}</p>
-          <p class="card-text fw-bold">{{ produto.preco !== undefined ? 'R$ ' + produto.preco.toFixed(2) : 'Preço não definido' }}</p>
+          <p class="card-text fw-bold">
+            <ng-container *ngIf="produto.preco !== undefined && produto.preco !== null">
+              R$ {{ produto.preco.toFixed(2) }}
+            </ng-container>
+            <ng-container *ngIf="produto.preco === undefined || produto.preco === null">
+              Preço não definido
+            </ng-container>
+          </p>
           <span class="badge rounded-pill" [ngClass]="produto.status === 'disponivel' ? 'bg-success' : (produto.status === 'indisponivel' ? 'bg-danger' : 'bg-secondary')">
             {{ produto.status === 'disponivel' ? 'Disponível' : (produto.status === 'indisponivel' ? 'Indisponível' : 'Status não definido') }}
           </span>
           <p class="card-text small mt-2">Categoria: {{ produto.categoria?.nome || 'Sem categoria' }}</p>
+          <p class="card-text small" *ngIf="produto.estoque_minimo !== undefined && produto.estoque_minimo !== null">
+            Estoque mínimo: {{ produto.estoque_minimo }}
+          </p>
         </div>
         <div class="card-footer bg-transparent d-flex justify-content-between">
           <button 

@@ -12,7 +12,27 @@ class NotificarCozinhaListener implements ShouldQueue
 {
     use InteractsWithQueue;
 
-    public function handleNovoPedido(NovoPedidoEvent $event)
+    /**
+     * Handle the event.
+     */
+    public function handle($event)
+    {
+        if ($event instanceof NovoPedidoEvent) {
+            $this->handleNovoPedido($event);
+        } elseif ($event instanceof StatusPedidoEvent) {
+            $this->handleStatusPedido($event);
+        }
+    }
+
+    /**
+     * Invokable handler (Laravel 8+)
+     */
+    public function __invoke($event)
+    {
+        return $this->handle($event);
+    }
+
+    protected function handleNovoPedido(NovoPedidoEvent $event)
     {
         // Aqui você pode implementar a lógica para notificar a cozinha
         // Por exemplo, enviar um email, SMS ou notificação push

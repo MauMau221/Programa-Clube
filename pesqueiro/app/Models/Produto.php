@@ -15,7 +15,8 @@ class Produto extends Model
         'preco',
         'status',
         'observacao',
-        'categoria_id'
+        'categoria_id',
+        'estoque_minimo'
     ];
 
 
@@ -30,5 +31,26 @@ class Produto extends Model
     public function categoria()
     {
         return $this->belongsTo(Categoria::class); //Um produto pertence a para muitas categorias
+    }
+
+    public function movimentacoes()
+    {
+        return $this->hasMany(EstoqueMovimentacao::class);
+    }
+
+    public function getEstoqueAtualAttribute()
+    {
+        $entradas = $this->movimentacoes()->where('tipo', 'entrada')->sum('quantidade');
+        $saidas = $this->movimentacoes()->where('tipo', 'saida')->sum('quantidade');
+        return $entradas - $saidas;
+    }
+
+    public function adicionarEstoque($quantidade, $motivo)
+    {
+        $this->movimentacoes()->create([
+            'quantidade' => $quantidade,
+            'tipo' => 'entrada',
+            'motivo' => $motivo
+        ]);
     }
 }

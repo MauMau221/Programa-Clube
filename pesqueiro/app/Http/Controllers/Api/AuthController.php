@@ -34,9 +34,9 @@ class AuthController extends Controller
     public function login(LoginRequest $request)
     {
         if (!Auth::attempt($request->only('email', 'password'))) {
-            throw ValidationException::withMessages([
-                'email' => ['As credenciais fornecidas estão incorretas.'],
-            ]);
+            return response()->json([
+                'message' => 'As credenciais fornecidas estão incorretas.'
+            ], 401);
         }
 
         $user = User::where('email', $request->email)->firstOrFail();

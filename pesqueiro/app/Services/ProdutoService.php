@@ -9,6 +9,16 @@ class ProdutoService
 
     public function criarProduto(array $dados)
     {
+        // Verifica se a categoria existe antes de tentar criar o produto
+        if (!\App\Models\Categoria::where('id', $dados['categoria_id'])->exists()) {
+            return response()->json([
+                'message' => 'A categoria informada não existe',
+                'errors' => [
+                    'categoria_id' => ['A categoria informada não existe']
+                ]
+            ], 422);
+        }
+
         $produto = Produto::create([
             "nome" => $dados['nome'],
             "preco" => $dados['preco'],
@@ -17,7 +27,7 @@ class ProdutoService
             "categoria_id" => $dados['categoria_id']
         ]);
 
-        return response()->json($produto, 201);
+        return $produto;
     }
 
 
@@ -38,6 +48,29 @@ class ProdutoService
     {
         $produto = Produto::findOrFail($produtoId);
         $produto->delete();
-        return response()->json(null, 204);
+        return response()->json([
+            'message' => 'Produto deletado com sucesso'
+        ], 200);
+    }
+
+    public function atualizarEstoque(int $produtoId, int $quantidade)
+    {
+        $produto = Produto::findOrFail($produtoId);
+        $produto->estoque = $quantidade;
+        $produto->save();
+
+        return response()->json([
+            'message' => 'Estoque atualizado com sucesso',
+            'produto' => $produto
+        ], 200);
+    }
+
+    public function buscarPorCategoria(int $categoriaId)
+    {
+        $produtos = Produto::where('categoria_id', $categoriaId)
+            ->with('categoria')
+            ->get();
+
+        return response()->json($produtos, 200);
     }
 }

@@ -19,32 +19,33 @@ class ComandaController extends Controller
 
     public function index()
     {
-        return Comanda::all();
+        $comandas = Comanda::all();
+        return response()->json($comandas, 200);
     }
 
     public function store(ComandaRequest $request)
     {
         $dados = $request->validated();
         $comanda = $this->comandaService->criarComanda($dados);
-        return $comanda;
+        return response()->json($comanda, 201);
     }
 
     public function show(string $id)
     {
         $comanda = Comanda::findOrFail($id);
-        return response()->json($comanda);
+        return response()->json($comanda, 200);
     }
 
     public function update(ComandaRequest $request, string $comandaId)
     {
         $dados = $request->validated();
         $comanda = $this->comandaService->editarComanda($dados, $comandaId);
-        return $comanda;
+        return response()->json($comanda, 200);
     }
 
     public function close(string $comandaId)
     {
         $comanda = $this->comandaService->fecharComanda($comandaId);
-        return $comanda;
+        return response()->json($comanda, 200);
     }
 }

@@ -6,21 +6,20 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-
     public function up()
     {
-        Schema::create('pedido_produto', function (Blueprint $table) {
+        Schema::create('estoque_movimentacoes', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('pedido_id')->constrained()->onDelete('cascade');
             $table->foreignId('produto_id')->constrained()->onDelete('cascade');
             $table->integer('quantidade');
+            $table->enum('tipo', ['entrada', 'saida']);
+            $table->string('motivo')->nullable();
             $table->timestamps();
         });
     }
 
-
-    public function down(): void
+    public function down()
     {
-        Schema::dropIfExists('pedido_produto');
+        Schema::dropIfExists('estoque_movimentacoes');
     }
-};
+}; 

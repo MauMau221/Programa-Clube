@@ -27,6 +27,13 @@ class EstoqueController extends Controller
     public function adicionar(Request $request, int $produtoId): JsonResponse
     {
         try {
+            // Verifica se o produto existe
+            if (!Produto::where('id', $produtoId)->exists()) {
+                return response()->json([
+                    'message' => 'Produto não encontrado'
+                ], 404);
+            }
+            
             $produto = Produto::findOrFail($produtoId);
             
             $request->validate([
@@ -46,10 +53,15 @@ class EstoqueController extends Controller
                 'estoque_atual' => $this->estoqueService->getSaldoAtual($produto)
             ], 201);
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Dados inválidos',
+                'errors' => $e->errors()
+            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Erro ao adicionar estoque: ' . $e->getMessage()
-            ], 400);
+            ], 500);
         }
     }
 
@@ -63,6 +75,13 @@ class EstoqueController extends Controller
     public function remover(Request $request, int $produtoId): JsonResponse
     {
         try {
+            // Verifica se o produto existe
+            if (!Produto::where('id', $produtoId)->exists()) {
+                return response()->json([
+                    'message' => 'Produto não encontrado'
+                ], 404);
+            }
+            
             $produto = Produto::findOrFail($produtoId);
             
             $request->validate([
@@ -89,10 +108,15 @@ class EstoqueController extends Controller
 
             return response()->json($response, 200);
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'message' => 'Dados inválidos',
+                'errors' => $e->errors()
+            ], 422);
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Erro ao remover estoque: ' . $e->getMessage()
-            ], 400);
+            ], 500);
         }
     }
 
@@ -105,6 +129,13 @@ class EstoqueController extends Controller
     public function historico(int $produtoId): JsonResponse
     {
         try {
+            // Verifica se o produto existe
+            if (!Produto::where('id', $produtoId)->exists()) {
+                return response()->json([
+                    'message' => 'Produto não encontrado'
+                ], 404);
+            }
+            
             $produto = Produto::findOrFail($produtoId);
             $historico = $this->estoqueService->getHistorico($produto);
 
@@ -116,7 +147,7 @@ class EstoqueController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Erro ao obter histórico: ' . $e->getMessage()
-            ], 400);
+            ], 500);
         }
     }
     
@@ -150,7 +181,7 @@ class EstoqueController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'message' => 'Erro ao listar produtos com estoque baixo: ' . $e->getMessage()
-            ], 400);
+            ], 500);
         }
     }
 } 

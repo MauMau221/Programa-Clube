@@ -1,0 +1,104 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Gerenciamento de Pedidos</h1>
+  </div>
+
+  <div class="alert alert-{{tipoMensagem}}" *ngIf="mensagem" role="alert">
+    {{mensagem}}
+    <button type="button" class="btn-close float-end" (click)="limparMensagem()"></button>
+  </div>
+
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <h5>Filtrar por Status</h5>
+          <div class="btn-group w-100" role="group">
+            <input type="radio" class="btn-check" name="filtroStatus" id="todos" [(ngModel)]="filtroStatus" value="todos" (change)="aplicarFiltros()">
+            <label class="btn btn-outline-secondary" for="todos">Todos</label>
+            
+            <input type="radio" class="btn-check" name="filtroStatus" id="pendente" [(ngModel)]="filtroStatus" value="pendente" (change)="aplicarFiltros()">
+            <label class="btn btn-outline-warning" for="pendente">Pendentes</label>
+            
+            <input type="radio" class="btn-check" name="filtroStatus" id="em-preparo" [(ngModel)]="filtroStatus" value="em preparo" (change)="aplicarFiltros()">
+            <label class="btn btn-outline-info" for="em-preparo">Em Preparo</label>
+            
+            <input type="radio" class="btn-check" name="filtroStatus" id="pronto" [(ngModel)]="filtroStatus" value="pronto" (change)="aplicarFiltros()">
+            <label class="btn btn-outline-success" for="pronto">Prontos</label>
+          </div>
+        </div>
+        <div class="col-md-6 text-end">
+          <button class="btn btn-primary" (click)="carregarPedidos()">
+            <i class="bi bi-arrow-clockwise"></i> Atualizar
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Carregando...</span>
+    </div>
+    <p class="mt-2">Carregando pedidos...</p>
+  </div>
+
+  <div *ngIf="!isLoading && pedidosFiltrados.length === 0" class="text-center my-5">
+    <i class="bi bi-check-circle-fill fs-1 text-success"></i>
+    <p class="mt-2" *ngIf="filtroStatus !== 'todos'">Não há pedidos com status "{{filtroStatus}}".</p>
+    <p class="mt-2" *ngIf="filtroStatus === 'todos'">Não há pedidos no sistema.</p>
+  </div>
+
+  <div class="row" *ngIf="!isLoading && pedidosFiltrados.length > 0">
+    <div class="col-md-12">
+      <h4 *ngIf="filtroStatus !== 'todos'">Pedidos com status: {{filtroStatus}}</h4>
+      <div class="row">
+        <div class="col-lg-6 mb-4" *ngFor="let pedido of pedidosFiltrados">
+          <div class="card shadow-sm">
+            <div class="card-header d-flex justify-content-between align-items-center">
+              <div>
+                <span class="badge rounded-pill me-2" [ngClass]="getStatusClass(pedido.status)">
+                  {{pedido.status}}
+                </span>
+                <strong>Mesa {{pedido.mesa}}</strong> - Pedido #{{pedido.id}}
+              </div>
+              <small>{{pedido.created_at | date:'dd/MM/yyyy HH:mm'}}</small>
+            </div>
+            <div class="card-body">
+              <h5 class="card-title">Itens do Pedido</h5>
+              <ul class="list-group mb-3">
+                <li class="list-group-item d-flex justify-content-between align-items-center" *ngFor="let item of pedido.itens">
+                  <div>
+                    <span class="fw-bold">{{item.quantidade}}x</span> {{item.produto?.nome}}
+                    <p class="text-muted mb-0" *ngIf="item.observacao">
+                      <small><i class="bi bi-info-circle"></i> {{item.observacao}}</small>
+                    </p>
+                  </div>
+                  <span>R$ {{item.valor_total.toFixed(2)}}</span>
+                </li>
+              </ul>
+              
+              <div class="d-flex justify-content-between">
+                <!-- Botões de ação baseados no status atual -->
+                <div class="btn-group">
+                  <button *ngIf="pedido.status.toLowerCase() === 'pendente'" class="btn btn-info text-white" (click)="atualizarStatus(pedido.id, 'em preparo')">
+                    <i class="bi bi-fire"></i> Iniciar Preparo
+                  </button>
+                  <button *ngIf="pedido.status.toLowerCase() === 'em preparo'" class="btn btn-success" (click)="atualizarStatus(pedido.id, 'pronto')">
+                    <i class="bi bi-check2-circle"></i> Marcar como Pronto
+                  </button>
+                  <button *ngIf="pedido.status.toLowerCase() === 'pronto'" class="btn btn-secondary" (click)="atualizarStatus(pedido.id, 'entregue')">
+                    <i class="bi bi-box-arrow-right"></i> Marcar como Entregue
+                  </button>
+                </div>
+                <button class="btn btn-outline-danger" *ngIf="pedido.status.toLowerCase() !== 'cancelado' && pedido.status.toLowerCase() !== 'entregue'" (click)="atualizarStatus(pedido.id, 'cancelado')">
+                  <i class="bi bi-x-circle"></i> Cancelar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

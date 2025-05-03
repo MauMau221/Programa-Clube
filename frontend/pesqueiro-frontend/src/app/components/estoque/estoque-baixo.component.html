@@ -1,0 +1,79 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Produtos com Estoque Baixo</h1>
+    <div>
+      <a routerLink="/estoque/movimentacao" class="btn btn-primary me-2">
+        <i class="bi bi-box-arrow-in-down"></i> Nova Movimentação
+      </a>
+      <a routerLink="/estoque" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Voltar
+      </a>
+    </div>
+  </div>
+
+  <div class="alert alert-{{tipoMensagem}}" *ngIf="mensagem" role="alert">
+    {{mensagem}}
+    <button type="button" class="btn-close float-end" (click)="limparMensagem()"></button>
+  </div>
+
+  <div *ngIf="isLoading" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Carregando...</span>
+    </div>
+    <p class="mt-2">Carregando produtos com estoque baixo...</p>
+  </div>
+
+  <div *ngIf="!isLoading && produtos.length === 0" class="text-center my-5">
+    <i class="bi bi-check-circle-fill fs-1 text-success"></i>
+    <p class="mt-2">Todos os produtos estão com estoque adequado!</p>
+  </div>
+
+  <div class="row" *ngIf="!isLoading && produtos.length > 0">
+    <div class="col-md-12">
+      <div class="card shadow-sm">
+        <div class="card-header bg-danger text-white">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          Produtos que precisam de reposição
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead>
+                <tr>
+                  <th scope="col">ID</th>
+                  <th scope="col">Produto</th>
+                  <th scope="col">Categoria</th>
+                  <th scope="col" class="text-center">Estoque Atual</th>
+                  <th scope="col" class="text-center">Estoque Mínimo</th>
+                  <th scope="col" class="text-center">Status</th>
+                  <th scope="col" class="text-end">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let produto of produtos" [ngClass]="{'table-danger': produto.quantidade_estoque === 0}">
+                  <td>{{ produto.id }}</td>
+                  <td>{{ produto.nome }}</td>
+                  <td>{{ produto.categoria?.nome || 'Sem categoria' }}</td>
+                  <td class="text-center fw-bold">{{ produto.quantidade_estoque || 0 }}</td>
+                  <td class="text-center">{{ produto.estoque_minimo || 0 }}</td>
+                  <td class="text-center">
+                    <span class="badge rounded-pill bg-danger" *ngIf="produto.quantidade_estoque === 0">Esgotado</span>
+                    <span class="badge rounded-pill bg-warning text-dark" *ngIf="produto.quantidade_estoque && produto.quantidade_estoque > 0 && produto.estoque_minimo && produto.quantidade_estoque < produto.estoque_minimo">Baixo</span>
+                  </td>
+                  <td class="text-end">
+                    <a [routerLink]="['/estoque/movimentacao', produto.id]" class="btn btn-sm btn-primary me-1">
+                      <i class="bi bi-plus-circle"></i> Repor
+                    </a>
+                    <a [routerLink]="['/estoque/historico', produto.id]" class="btn btn-sm btn-outline-secondary">
+                      <i class="bi bi-clock-history"></i> Histórico
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

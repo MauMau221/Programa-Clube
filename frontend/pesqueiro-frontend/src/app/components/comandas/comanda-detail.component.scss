@@ -1,0 +1,34 @@
+.card {
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+  
+  .card-header {
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+  }
+}
+
+.badge {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.table {
+  th, td {
+    vertical-align: middle;
+  }
+  
+  tfoot {
+    font-size: 1.1rem;
+  }
+}
+
+.btn-group {
+  .btn {
+    margin-right: 0.25rem;
+    
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+} 

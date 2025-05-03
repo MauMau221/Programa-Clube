@@ -1,0 +1,142 @@
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ isEditMode ? 'Editar' : 'Novo' }} Produto</h1>
+        <a routerLink="/produtos" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+      </div>
+
+      <div class="alert alert-{{tipoMensagem}}" *ngIf="mensagem" role="alert">
+        {{ mensagem }}
+        <button type="button" class="btn-close float-end" (click)="limparMensagem()"></button>
+      </div>
+
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div *ngIf="isLoading" class="text-center my-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Carregando...</span>
+            </div>
+            <p class="mt-2">Carregando...</p>
+          </div>
+
+          <form [formGroup]="produtoForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading">
+            <div class="mb-3">
+              <label for="nome" class="form-label">Nome do Produto*</label>
+              <input 
+                type="text" 
+                id="nome" 
+                formControlName="nome" 
+                class="form-control" 
+                [ngClass]="{'is-invalid': produtoForm.get('nome')?.invalid && produtoForm.get('nome')?.touched}"
+                placeholder="Nome do produto"
+              />
+              <div class="invalid-feedback" *ngIf="produtoForm.get('nome')?.errors?.['required'] && produtoForm.get('nome')?.touched">
+                Nome do produto é obrigatório
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="preco" class="form-label">Preço*</label>
+              <div class="input-group">
+                <span class="input-group-text">R$</span>
+                <input 
+                  type="number" 
+                  id="preco" 
+                  formControlName="preco" 
+                  class="form-control" 
+                  [ngClass]="{'is-invalid': produtoForm.get('preco')?.invalid && produtoForm.get('preco')?.touched}"
+                  step="0.01"
+                  min="0.01"
+                />
+                <div class="invalid-feedback" *ngIf="produtoForm.get('preco')?.errors?.['required'] && produtoForm.get('preco')?.touched">
+                  Preço é obrigatório
+                </div>
+                <div class="invalid-feedback" *ngIf="produtoForm.get('preco')?.errors?.['min'] && produtoForm.get('preco')?.touched">
+                  Preço deve ser maior que zero
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="categoria_id" class="form-label">Categoria*</label>
+              <select 
+                id="categoria_id" 
+                formControlName="categoria_id" 
+                class="form-select"
+                [ngClass]="{'is-invalid': produtoForm.get('categoria_id')?.invalid && produtoForm.get('categoria_id')?.touched}"
+              >
+                <option value="">Selecione uma categoria</option>
+                <option *ngFor="let categoria of categorias" [value]="categoria.id">
+                  {{ categoria.nome }}
+                </option>
+              </select>
+              <div class="invalid-feedback" *ngIf="produtoForm.get('categoria_id')?.errors?.['required'] && produtoForm.get('categoria_id')?.touched">
+                Categoria é obrigatória
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="status" class="form-label">Status*</label>
+              <select 
+                id="status" 
+                formControlName="status" 
+                class="form-select"
+                [ngClass]="{'is-invalid': produtoForm.get('status')?.invalid && produtoForm.get('status')?.touched}"
+              >
+                <option value="disponivel">Disponível</option>
+                <option value="indisponivel">Indisponível</option>
+              </select>
+              <div class="invalid-feedback" *ngIf="produtoForm.get('status')?.errors?.['required'] && produtoForm.get('status')?.touched">
+                Status é obrigatório
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="observacao" class="form-label">Observação</label>
+              <textarea 
+                id="observacao" 
+                formControlName="observacao" 
+                class="form-control" 
+                rows="3"
+                placeholder="Observações do produto (opcional)"
+              ></textarea>
+            </div>
+
+            <div class="mb-3">
+              <label for="estoque_minimo" class="form-label">Estoque Mínimo*</label>
+              <input 
+                type="number" 
+                id="estoque_minimo" 
+                formControlName="estoque_minimo" 
+                class="form-control" 
+                [ngClass]="{'is-invalid': produtoForm.get('estoque_minimo')?.invalid && produtoForm.get('estoque_minimo')?.touched}"
+                min="0"
+              />
+              <div class="invalid-feedback" *ngIf="produtoForm.get('estoque_minimo')?.errors?.['required'] && produtoForm.get('estoque_minimo')?.touched">
+                Estoque mínimo é obrigatório
+              </div>
+              <div class="invalid-feedback" *ngIf="produtoForm.get('estoque_minimo')?.errors?.['min'] && produtoForm.get('estoque_minimo')?.touched">
+                Estoque mínimo não pode ser negativo
+              </div>
+              <small class="form-text text-muted">Quantidade mínima para alertas de estoque baixo</small>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button 
+                type="submit" 
+                class="btn btn-primary" 
+                [disabled]="produtoForm.invalid || isLoading"
+              >
+                <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                {{ isEditMode ? 'Atualizar' : 'Criar' }} Produto
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

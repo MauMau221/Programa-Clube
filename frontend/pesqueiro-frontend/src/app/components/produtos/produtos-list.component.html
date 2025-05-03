@@ -1,0 +1,94 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Gerenciamento de Produtos</h1>
+    <a routerLink="/produtos/novo" class="btn btn-primary">
+      <i class="bi bi-plus-circle"></i> Novo Produto
+    </a>
+  </div>
+
+  <div class="alert alert-{{tipoMensagem}}" *ngIf="mensagem" role="alert">
+    {{mensagem}}
+    <button type="button" class="btn-close float-end" (click)="limparMensagem()"></button>
+  </div>
+
+  <div class="card shadow-sm mb-4">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-8 mb-3">
+          <div class="input-group">
+            <span class="input-group-text">
+              <i class="bi bi-search"></i>
+            </span>
+            <input 
+              type="text" 
+              class="form-control" 
+              placeholder="Buscar produtos por nome ou observação..." 
+              [(ngModel)]="termoBusca"
+              (ngModelChange)="aplicarFiltros()"
+            >
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <select class="form-select" [(ngModel)]="filtroDisponibilidade" (ngModelChange)="aplicarFiltros()">
+            <option value="todos">Todos os produtos</option>
+            <option value="disponiveis">Somente disponíveis</option>
+            <option value="indisponiveis">Somente indisponíveis</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Carregando...</span>
+    </div>
+    <p class="mt-2">Carregando produtos...</p>
+  </div>
+
+  <div *ngIf="!isLoading && produtosFiltrados.length === 0" class="text-center my-5">
+    <i class="bi bi-box fs-1 text-muted"></i>
+    <p class="mt-2" *ngIf="termoBusca || filtroDisponibilidade !== 'todos'">Nenhum produto encontrado com os filtros selecionados.</p>
+    <p class="mt-2" *ngIf="!termoBusca && filtroDisponibilidade === 'todos'">Nenhum produto cadastrado. Crie seu primeiro produto!</p>
+  </div>
+
+  <div class="row" *ngIf="!isLoading && produtosFiltrados.length > 0">
+    <div class="col-md-4 mb-4" *ngFor="let produto of produtosFiltrados">
+      <div class="card h-100 shadow-sm produto-card" [class.indisponivel]="produto.status === 'indisponivel'">
+        <div class="card-body">
+          <h5 class="card-title">{{ produto.nome }}</h5>
+          <p class="card-text small text-muted">{{ produto.observacao || 'Sem observações' }}</p>
+          <p class="card-text fw-bold">{{ produto.preco !== undefined ? 'R$ ' + produto.preco.toFixed(2) : 'Preço não definido' }}</p>
+          <span class="badge rounded-pill" [ngClass]="produto.status === 'disponivel' ? 'bg-success' : (produto.status === 'indisponivel' ? 'bg-danger' : 'bg-secondary')">
+            {{ produto.status === 'disponivel' ? 'Disponível' : (produto.status === 'indisponivel' ? 'Indisponível' : 'Status não definido') }}
+          </span>
+          <p class="card-text small mt-2">Categoria: {{ produto.categoria?.nome || 'Sem categoria' }}</p>
+        </div>
+        <div class="card-footer bg-transparent d-flex justify-content-between">
+          <button 
+            class="btn btn-sm btn-outline-primary" 
+            (click)="editarProduto(produto.id)"
+            title="Editar produto"
+          >
+            <i class="bi bi-pencil"></i>
+          </button>
+          <button 
+            class="btn btn-sm" 
+            [ngClass]="produto.status === 'disponivel' ? 'btn-outline-danger' : 'btn-outline-success'"
+            (click)="toggleDisponibilidade($event, produto)"
+            title="{{ produto.status === 'disponivel' ? 'Marcar como indisponível' : 'Marcar como disponível' }}"
+          >
+            <i class="bi" [ngClass]="produto.status === 'disponivel' ? 'bi-x-circle' : 'bi-check-circle'"></i>
+          </button>
+          <button 
+            class="btn btn-sm btn-outline-danger" 
+            (click)="excluirProduto($event, produto)"
+            title="Excluir produto"
+          >
+            <i class="bi bi-trash"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

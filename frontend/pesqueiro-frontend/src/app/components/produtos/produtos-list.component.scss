@@ -1,0 +1,37 @@
+.produto-card {
+  transition: transform 0.3s, box-shadow 0.3s;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  }
+  
+  &.indisponivel {
+    opacity: 0.7;
+  }
+  
+  .card-body {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .badge {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+  }
+  
+  .btn-group {
+    .btn {
+      padding: 0.25rem 0.5rem;
+      margin-right: 0.25rem;
+      
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+  }
+}
+
+.card-footer {
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+} 

@@ -1,0 +1,67 @@
+<div class="container mt-4">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ isEditMode ? 'Editar' : 'Nova' }} Comanda</h1>
+        <a routerLink="/comandas" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+      </div>
+
+      <div class="alert alert-{{tipoMensagem}}" *ngIf="mensagem" role="alert">
+        {{ mensagem }}
+        <button type="button" class="btn-close float-end" (click)="limparMensagem()"></button>
+      </div>
+
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div *ngIf="isLoading" class="text-center my-5">
+            <div class="spinner-border text-primary" role="status">
+              <span class="visually-hidden">Carregando...</span>
+            </div>
+            <p class="mt-2">Carregando...</p>
+          </div>
+
+          <form [formGroup]="comandaForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading">
+            <div class="mb-3">
+              <label for="mesa" class="form-label">Mesa*</label>
+              <input 
+                type="text" 
+                id="mesa" 
+                formControlName="mesa" 
+                class="form-control" 
+                [ngClass]="{'is-invalid': comandaForm.get('mesa')?.invalid && comandaForm.get('mesa')?.touched}"
+                placeholder="Número da mesa ou identificação"
+              />
+              <div class="invalid-feedback" *ngIf="comandaForm.get('mesa')?.errors?.['required'] && comandaForm.get('mesa')?.touched">
+                Mesa é obrigatório
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="cliente" class="form-label">Cliente</label>
+              <input 
+                type="text" 
+                id="cliente" 
+                formControlName="cliente" 
+                class="form-control" 
+                placeholder="Nome do cliente (opcional)"
+              />
+            </div>
+
+            <div class="d-grid gap-2">
+              <button 
+                type="submit" 
+                class="btn btn-primary" 
+                [disabled]="comandaForm.invalid || isLoading"
+              >
+                <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                {{ isEditMode ? 'Atualizar' : 'Criar' }} Comanda
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

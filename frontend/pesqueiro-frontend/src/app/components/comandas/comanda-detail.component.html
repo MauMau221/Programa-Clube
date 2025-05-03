@@ -1,0 +1,182 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Detalhes da Comanda #{{ comanda?.id }}</h1>
+    <div>
+      <a routerLink="/comandas" class="btn btn-outline-secondary me-2">
+        <i class="bi bi-arrow-left"></i> Voltar
+      </a>
+      <button *ngIf="comanda?.status === 'aberta'" class="btn btn-success me-2" (click)="fecharComanda()">
+        <i class="bi bi-check-circle"></i> Fechar Comanda
+      </button>
+      <button *ngIf="comanda?.status === 'aberta'" class="btn btn-danger" (click)="cancelarComanda()">
+        <i class="bi bi-x-circle"></i> Cancelar Comanda
+      </button>
+    </div>
+  </div>
+
+  <div class="alert alert-{{tipoMensagem}}" *ngIf="mensagem" role="alert">
+    {{ mensagem }}
+    <button type="button" class="btn-close float-end" (click)="limparMensagem()"></button>
+  </div>
+
+  <div *ngIf="isLoading" class="text-center my-5">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Carregando...</span>
+    </div>
+    <p class="mt-2">Carregando comanda...</p>
+  </div>
+
+  <div class="row" *ngIf="!isLoading && comanda">
+    <div class="col-md-4">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Informações da Comanda</h5>
+        </div>
+        <div class="card-body">
+          <div class="mb-3">
+            <strong>Status:</strong>
+            <span class="badge ms-2" [ngClass]="{
+              'bg-success': comanda.status === 'aberta',
+              'bg-danger': comanda.status === 'cancelada',
+              'bg-secondary': comanda.status === 'fechada'
+            }">
+              {{ comanda.status | titlecase }}
+            </span>
+          </div>
+          <div class="mb-3">
+            <strong>Mesa:</strong> {{ comanda.mesa }}
+          </div>
+          <div class="mb-3">
+            <strong>Cliente:</strong> {{ comanda.cliente || 'N/A' }}
+          </div>
+          <div class="mb-3">
+            <strong>Aberta em:</strong> {{ comanda.created_at | date:'dd/MM/yyyy HH:mm' }}
+          </div>
+          <div>
+            <strong>Valor Total:</strong> <span class="fs-4 ms-2 fw-bold text-success">R$ {{ comanda.valor_total.toFixed(2) }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card shadow-sm" *ngIf="comanda.status === 'aberta'">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Adicionar Item</h5>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="itemForm" (ngSubmit)="adicionarItem()">
+            <div class="mb-3">
+              <label for="produto_id" class="form-label">Produto*</label>
+              <select 
+                id="produto_id" 
+                formControlName="produto_id" 
+                class="form-select"
+                [ngClass]="{'is-invalid': itemForm.get('produto_id')?.invalid && itemForm.get('produto_id')?.touched}"
+                (change)="onProdutoChange()"
+              >
+                <option value="">Selecione um produto</option>
+                <option *ngFor="let produto of produtos" [value]="produto.id">
+                  {{ produto.nome }} - R$ {{ produto.preco.toFixed(2) }}
+                </option>
+              </select>
+              <div class="invalid-feedback" *ngIf="itemForm.get('produto_id')?.errors?.['required'] && itemForm.get('produto_id')?.touched">
+                Produto é obrigatório
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="quantidade" class="form-label">Quantidade*</label>
+              <input 
+                type="number" 
+                id="quantidade" 
+                formControlName="quantidade" 
+                class="form-control" 
+                min="1"
+                [ngClass]="{'is-invalid': itemForm.get('quantidade')?.invalid && itemForm.get('quantidade')?.touched}"
+              />
+              <div class="invalid-feedback" *ngIf="itemForm.get('quantidade')?.errors?.['required'] && itemForm.get('quantidade')?.touched">
+                Quantidade é obrigatória
+              </div>
+              <div class="invalid-feedback" *ngIf="itemForm.get('quantidade')?.errors?.['min'] && itemForm.get('quantidade')?.touched">
+                Quantidade mínima é 1
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="observacao" class="form-label">Observação</label>
+              <textarea 
+                id="observacao" 
+                formControlName="observacao" 
+                class="form-control" 
+                rows="2"
+                placeholder="Ex: Sem cebola, bem passado, etc."
+              ></textarea>
+            </div>
+
+            <div class="d-grid">
+              <button 
+                type="submit" 
+                class="btn btn-primary" 
+                [disabled]="itemForm.invalid || isLoading"
+              >
+                <i class="bi bi-plus-circle me-1"></i> Adicionar Item
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-8">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <h5 class="mb-0">Itens da Comanda</h5>
+        </div>
+        <div class="card-body">
+          <div *ngIf="comanda.itens?.length === 0" class="text-center my-5">
+            <i class="bi bi-cart-x fs-1 text-muted"></i>
+            <p class="mt-2">Nenhum item adicionado à comanda.</p>
+          </div>
+
+          <div class="table-responsive" *ngIf="comanda.itens && comanda.itens.length > 0">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Produto</th>
+                  <th class="text-center">Qtd</th>
+                  <th class="text-end">Valor Unit.</th>
+                  <th class="text-end">Subtotal</th>
+                  <th *ngIf="comanda.status === 'aberta'">Ações</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of comanda.itens">
+                  <td>
+                    <div>
+                      <strong>{{ item.produto?.nome }}</strong>
+                    </div>
+                    <small *ngIf="item.observacao" class="text-muted">{{ item.observacao }}</small>
+                  </td>
+                  <td class="text-center">{{ item.quantidade }}</td>
+                  <td class="text-end">R$ {{ item.valor_unitario.toFixed(2) }}</td>
+                  <td class="text-end">R$ {{ item.valor_total.toFixed(2) }}</td>
+                  <td *ngIf="comanda.status === 'aberta'">
+                    <button class="btn btn-sm btn-outline-danger" (click)="removerItem(item.id)">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr>
+                  <td colspan="3" class="text-end fw-bold">Total:</td>
+                  <td class="text-end fw-bold">R$ {{ comanda.valor_total.toFixed(2) }}</td>
+                  <td *ngIf="comanda.status === 'aberta'"></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

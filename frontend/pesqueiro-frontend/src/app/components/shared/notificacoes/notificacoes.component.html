@@ -1,0 +1,50 @@
+<div class="notificacao-container">
+  <div class="notificacao-icon" (click)="toggleDropdown()">
+    <i class="bi bi-bell-fill fs-5"></i>
+    <span *ngIf="contarNotificacoesNaoLidas() > 0" class="notificacao-badge">
+      {{ contarNotificacoesNaoLidas() }}
+    </span>
+  </div>
+
+  <div class="notificacao-dropdown" *ngIf="mostraDropdown">
+    <div class="notificacao-header">
+      <h6 class="mb-0">Notificações</h6>
+      <button class="btn btn-sm btn-light" (click)="limparNotificacoesLidas($event)" *ngIf="notificacoes.length > 0">
+        <i class="bi bi-trash"></i> Limpar lidas
+      </button>
+    </div>
+    
+    <div class="notificacao-body">
+      <div *ngIf="notificacoes.length === 0" class="text-center py-3">
+        <i class="bi bi-bell-slash fs-4 text-muted"></i>
+        <p class="mb-0 mt-1 text-muted">Nenhuma notificação</p>
+      </div>
+      
+      <a 
+        *ngFor="let notificacao of notificacoes" 
+        [routerLink]="notificacao.link" 
+        class="notificacao-item" 
+        [class.lida]="notificacao.lida"
+        (click)="marcarComoLida(notificacao.id, $event)"
+      >
+        <div class="notificacao-icon-small">
+          <i [class]="getIconeNotificacao(notificacao.tipo)" [ngClass]="getCorNotificacao(notificacao.tipo)"></i>
+        </div>
+        <div class="notificacao-content">
+          <div class="notificacao-titulo">{{ notificacao.titulo }}</div>
+          <div class="notificacao-mensagem">{{ notificacao.mensagem }}</div>
+          <div class="notificacao-data">{{ formatarData(notificacao.data) }}</div>
+        </div>
+        <button class="btn btn-sm notificacao-marcar" (click)="marcarComoLida(notificacao.id, $event)" *ngIf="!notificacao.lida">
+          <i class="bi bi-check2"></i>
+        </button>
+      </a>
+    </div>
+    
+    <div class="notificacao-footer">
+      <a routerLink="/pedidos" *ngIf="pedidosPendentes > 0" class="notificacao-link">
+        <i class="bi bi-arrow-right"></i> Ver {{ pedidosPendentes }} pedido(s) pendente(s)
+      </a>
+    </div>
+  </div>
+</div>

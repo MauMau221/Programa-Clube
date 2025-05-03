@@ -1,0 +1,43 @@
+.card {
+  border-radius: 0.5rem;
+  transition: box-shadow 0.3s;
+
+  &:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  }
+}
+
+.badge {
+  font-size: 0.85rem;
+  padding: 0.5rem 0.75rem;
+}
+
+.list-group-item {
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+  }
+}
+
+.btn-group {
+  .btn {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+}
+
+// Animação para itens recém adicionados
+@keyframes highlight {
+  0% {
+    background-color: rgba(255, 243, 205, 0.8);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+
+.new-item {
+  animation: highlight 2s ease-in-out;
+}

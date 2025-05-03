@@ -1,0 +1,160 @@
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Movimentação de Estoque</h1>
+    <a routerLink="/estoque" class="btn btn-outline-secondary">
+      <i class="bi bi-arrow-left"></i> Voltar
+    </a>
+  </div>
+
+  <div class="alert alert-{{tipoMensagem}}" *ngIf="mensagem" role="alert">
+    {{mensagem}}
+    <button type="button" class="btn-close float-end" (click)="limparMensagem()"></button>
+  </div>
+
+  <div class="row">
+    <div class="col-lg-8">
+      <div class="card shadow-sm mb-4">
+        <div class="card-header">
+          <ul class="nav nav-tabs card-header-tabs">
+            <li class="nav-item">
+              <a class="nav-link" [class.active]="tipoMovimentacao === 'entrada'" (click)="setTipoMovimentacao('entrada')" href="javascript:void(0)">
+                <i class="bi bi-box-arrow-in-down me-1"></i> Entrada de Estoque
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" [class.active]="tipoMovimentacao === 'saida'" (click)="setTipoMovimentacao('saida')" href="javascript:void(0)">
+                <i class="bi bi-box-arrow-up me-1"></i> Saída de Estoque
+              </a>
+            </li>
+          </ul>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="movimentacaoForm" (ngSubmit)="onSubmit()">
+            <div class="mb-3">
+              <label for="produto_id" class="form-label">Produto*</label>
+              <select 
+                id="produto_id" 
+                formControlName="produto_id" 
+                class="form-select" 
+                [ngClass]="{'is-invalid': movimentacaoForm.get('produto_id')?.invalid && movimentacaoForm.get('produto_id')?.touched}"
+                (change)="onChangeProduto()"
+              >
+                <option value="">Selecione um produto</option>
+                <option *ngFor="let produto of produtos" [value]="produto.id">
+                  {{ produto.nome }}
+                </option>
+              </select>
+              <div class="invalid-feedback" *ngIf="movimentacaoForm.get('produto_id')?.errors?.['required'] && movimentacaoForm.get('produto_id')?.touched">
+                Produto é obrigatório
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="quantidade" class="form-label">Quantidade*</label>
+              <input 
+                type="number" 
+                id="quantidade" 
+                formControlName="quantidade" 
+                class="form-control" 
+                [ngClass]="{'is-invalid': movimentacaoForm.get('quantidade')?.invalid && movimentacaoForm.get('quantidade')?.touched}"
+                min="1"
+              />
+              <div class="invalid-feedback" *ngIf="movimentacaoForm.get('quantidade')?.errors?.['required'] && movimentacaoForm.get('quantidade')?.touched">
+                Quantidade é obrigatória
+              </div>
+              <div class="invalid-feedback" *ngIf="movimentacaoForm.get('quantidade')?.errors?.['min'] && movimentacaoForm.get('quantidade')?.touched">
+                Quantidade deve ser maior que zero
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label for="motivo" class="form-label">Motivo</label>
+              <textarea 
+                id="motivo" 
+                formControlName="motivo" 
+                class="form-control" 
+                rows="3"
+                placeholder="Informe o motivo desta movimentação (opcional)"
+              ></textarea>
+            </div>
+
+            <div class="d-grid gap-2">
+              <button 
+                type="submit" 
+                class="btn" 
+                [ngClass]="tipoMovimentacao === 'entrada' ? 'btn-success' : 'btn-danger'"
+                [disabled]="movimentacaoForm.invalid || isLoading"
+              >
+                <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                <i class="bi" [ngClass]="tipoMovimentacao === 'entrada' ? 'bi-box-arrow-in-down' : 'bi-box-arrow-up'"></i>
+                {{ tipoMovimentacao === 'entrada' ? 'Adicionar ao Estoque' : 'Remover do Estoque' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4" *ngIf="produtoSelecionado">
+      <div class="card shadow-sm">
+        <div class="card-header bg-primary text-white">
+          <i class="bi bi-info-circle me-1"></i> Informações do Produto
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">{{ produtoSelecionado.nome }}</h5>
+          <p class="card-text text-muted">{{ produtoSelecionado.observacao || 'Sem observações' }}</p>
+          
+          <div class="d-flex justify-content-between mt-3 mb-2">
+            <strong>Categoria:</strong>
+            <span>{{ produtoSelecionado.categoria?.nome || 'Sem categoria' }}</span>
+          </div>
+          
+          <div class="d-flex justify-content-between mb-2">
+            <strong>Preço:</strong>
+            <span class="text-primary">R$ {{ produtoSelecionado.preco.toFixed(2) }}</span>
+          </div>
+          
+          <div class="d-flex justify-content-between mb-2">
+            <strong>Disponível:</strong>
+            <span [ngClass]="produtoSelecionado.status === 'disponivel' ? 'text-success' : 'text-danger'">
+              {{ produtoSelecionado.status === 'disponivel' ? 'Sim' : 'Não' }}
+            </span>
+          </div>
+          
+          <hr>
+          
+          <div class="d-flex justify-content-between mb-2">
+            <strong>Estoque atual:</strong>
+            <span class="fs-5 fw-bold" [ngClass]="{
+              'text-danger': produtoSelecionado.quantidade_estoque === 0,
+              'text-warning': produtoSelecionado.quantidade_estoque && produtoSelecionado.quantidade_estoque > 0 && produtoSelecionado.estoque_minimo && produtoSelecionado.quantidade_estoque < produtoSelecionado.estoque_minimo,
+              'text-success': produtoSelecionado.quantidade_estoque && produtoSelecionado.estoque_minimo && produtoSelecionado.quantidade_estoque >= produtoSelecionado.estoque_minimo
+            }">
+              {{ produtoSelecionado.quantidade_estoque || 0 }} unidades
+            </span>
+          </div>
+          
+          <div class="d-flex justify-content-between mb-2">
+            <strong>Estoque mínimo:</strong>
+            <span>{{ produtoSelecionado.estoque_minimo || 0 }} unidades</span>
+          </div>
+          
+          <div class="mt-3 mb-2">
+            <strong>Status:</strong>
+            <div class="mt-1">
+              <span class="badge rounded-pill bg-danger me-1" *ngIf="produtoSelecionado.quantidade_estoque === 0">Esgotado</span>
+              <span class="badge rounded-pill bg-warning text-dark me-1" *ngIf="produtoSelecionado.quantidade_estoque && produtoSelecionado.quantidade_estoque > 0 && produtoSelecionado.estoque_minimo && produtoSelecionado.quantidade_estoque < produtoSelecionado.estoque_minimo">Estoque Baixo</span>
+              <span class="badge rounded-pill bg-success me-1" *ngIf="produtoSelecionado.quantidade_estoque && produtoSelecionado.estoque_minimo && produtoSelecionado.quantidade_estoque >= produtoSelecionado.estoque_minimo">Estoque Adequado</span>
+            </div>
+          </div>
+          
+          <div class="mt-3">
+            <a [routerLink]="['/estoque/historico', produtoSelecionado.id]" class="btn btn-sm btn-outline-secondary w-100">
+              <i class="bi bi-clock-history me-1"></i> Ver Histórico de Estoque
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div> 

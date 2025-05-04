@@ -23,7 +23,7 @@ class Pedido extends Model
     {
         return $this->belongsToMany(Produto::class, 'pedido_produto')
             ->using(PedidoProduto::class)
-            ->withPivot('quantidade')
+            ->withPivot(['id', 'quantidade', 'observacao'])
             ->withTimestamps();
     }
     public function comanda()

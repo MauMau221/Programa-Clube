@@ -7,6 +7,8 @@ use App\Events\StatusPedidoEvent;
 use App\Models\Comanda;
 use App\Models\Pedido;
 use App\Models\Produto;
+use Illuminate\Support\Facades\DB;
+use Exception;
 
 class PedidoService
 {
@@ -397,5 +399,18 @@ class PedidoService
             'pedido' => $pedido->load('produtos'),
             'message' => 'Quantidade atualizada com sucesso'
         ]);
+    }
+
+    /**
+     * Buscar pedidos não enviados para a cozinha de uma comanda
+     */
+    public function buscarPedidosPendentesEnvio(string $comandaId)
+    {
+        $pedido = Pedido::where('comanda_id', $comandaId)
+            ->where('status', 'pedido_iniciado')
+            ->with(['produtos', 'comanda'])
+            ->first();
+
+        return $pedido;
     }
 }

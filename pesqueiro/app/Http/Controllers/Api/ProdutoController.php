@@ -30,6 +30,35 @@ class ProdutoController extends Controller
         return response()->json($produtos, 200);
     }
 
+    public function produtosDisponiveis()
+    {
+        $produtos = Produto::with('categoria')
+            ->where('status', 'disponivel')
+            ->get();
+        
+        // Preparar os produtos para o JSON
+        $produtosPreparados = $produtos->map(function ($produto) {
+            // Certifique-se de que o preço é sempre um número
+            $preco = floatval($produto->preco);
+            
+            return [
+                'id' => $produto->id,
+                'nome' => $produto->nome,
+                'preco' => $preco,
+                'status' => $produto->status,
+                'observacao' => $produto->observacao,
+                'categoria_id' => $produto->categoria_id,
+                'categoria' => $produto->categoria,
+                'estoque_minimo' => $produto->estoque_minimo,
+                'quantidade_estoque' => $produto->estoque_atual,
+                'created_at' => $produto->created_at,
+                'updated_at' => $produto->updated_at
+            ];
+        });
+        
+        return response()->json($produtosPreparados, 200);
+    }
+
     public function store(ProdutoRequest $request)
     {
         try {

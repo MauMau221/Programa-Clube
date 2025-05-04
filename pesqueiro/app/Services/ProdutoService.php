@@ -31,8 +31,11 @@ class ProdutoService
     }
 
 
-    public function buscarProduto(int $produtoId)
+    public function buscarProduto($produtoId)
     {
+        // Converter para inteiro caso seja uma string
+        $produtoId = is_string($produtoId) ? (int)$produtoId : $produtoId;
+        
         $produto = Produto::with('categoria')->findOrFail($produtoId);
         
         // Adicionar o campo quantidade_estoque à resposta
@@ -41,15 +44,21 @@ class ProdutoService
         return response()->json($produto, 200);  
     }
 
-    public function editarProduto(array $dados, int $produtoId)
+    public function editarProduto(array $dados, $produtoId)
     {
+        // Converter para inteiro caso seja uma string
+        $produtoId = is_string($produtoId) ? (int)$produtoId : $produtoId;
+        
         $produto = Produto::findOrFail($produtoId);
         $produto->update($dados);
         return response()->json($produto, 200);
     }
 
-    public function deletarProduto(int $produtoId)
+    public function deletarProduto($produtoId)
     {
+        // Converter para inteiro caso seja uma string
+        $produtoId = is_string($produtoId) ? (int)$produtoId : $produtoId;
+        
         $produto = Produto::findOrFail($produtoId);
         $produto->delete();
         return response()->json([
@@ -57,8 +66,12 @@ class ProdutoService
         ], 200);
     }
 
-    public function atualizarEstoque(int $produtoId, int $quantidade)
+    public function atualizarEstoque($produtoId, $quantidade)
     {
+        // Converter para inteiro caso seja uma string
+        $produtoId = is_string($produtoId) ? (int)$produtoId : $produtoId;
+        $quantidade = is_string($quantidade) ? (int)$quantidade : $quantidade;
+        
         $produto = Produto::findOrFail($produtoId);
         $produto->estoque = $quantidade;
         $produto->save();
@@ -69,8 +82,11 @@ class ProdutoService
         ], 200);
     }
 
-    public function buscarPorCategoria(int $categoriaId)
+    public function buscarPorCategoria($categoriaId)
     {
+        // Converter para inteiro caso seja uma string
+        $categoriaId = is_string($categoriaId) ? (int)$categoriaId : $categoriaId;
+        
         $produtos = Produto::where('categoria_id', $categoriaId)
             ->with('categoria')
             ->get();

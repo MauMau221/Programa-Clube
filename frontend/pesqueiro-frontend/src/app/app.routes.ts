@@ -14,6 +14,7 @@ import { EstoqueBaixoComponent } from './components/estoque/estoque-baixo.compon
 import { EstoqueMovimentacaoComponent } from './components/estoque/estoque-movimentacao.component';
 import { EstoqueHistoricoComponent } from './components/estoque/estoque-historico.component';
 import { PedidosListComponent } from './components/pedidos/pedidos-list/pedidos-list.component';
+import { PainelClienteComponent } from './components/painel/painel-cliente.component';
 import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
@@ -24,6 +25,10 @@ export const routes: Routes = [
     path: 'dashboard', 
     component: DashboardComponent,
     canActivate: [authGuard]
+  },
+  { 
+    path: 'painel', 
+    component: PainelClienteComponent 
   },
   { 
     path: 'comandas', 

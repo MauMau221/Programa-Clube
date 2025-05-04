@@ -5,6 +5,9 @@
       <a routerLink="/comandas" class="btn btn-outline-secondary me-2">
         <i class="bi bi-arrow-left"></i> Voltar
       </a>
+      <button *ngIf="temPedidoPendente && comanda?.status === 'aberta'" class="btn btn-warning me-2" (click)="enviarParaCozinha()">
+        <i class="bi bi-send"></i> Enviar para Cozinha
+      </button>
       <button *ngIf="comanda?.status === 'aberta'" class="btn btn-success me-2" (click)="fecharComanda()">
         <i class="bi bi-check-circle"></i> Fechar Comanda
       </button>
@@ -53,7 +56,7 @@
             <strong>Aberta em:</strong> {{ comanda.created_at | date:'dd/MM/yyyy HH:mm' }}
           </div>
           <div>
-            <strong>Valor Total:</strong> <span class="fs-4 ms-2 fw-bold text-success">R$ {{ comanda.total.toFixed(2) }}</span>
+            <strong>Valor Total:</strong> <span class="fs-4 ms-2 fw-bold text-success">R$ {{ comanda.total ? comanda.total.toFixed(2) : '0.00' }}</span>
           </div>
         </div>
       </div>
@@ -75,7 +78,7 @@
               >
                 <option value="">Selecione um produto</option>
                 <option *ngFor="let produto of produtos" [value]="produto.id">
-                  {{ produto.nome }} - R$ {{ produto.preco.toFixed(2) }}
+                  {{ produto.nome }} - R$ {{ produto.preco ? produto.preco.toFixed(2) : '0.00' }}
                 </option>
               </select>
               <div class="invalid-feedback" *ngIf="itemForm.get('produto_id')?.errors?.['required'] && itemForm.get('produto_id')?.touched">
@@ -127,6 +130,18 @@
     </div>
 
     <div class="col-md-8">
+      <div *ngIf="temPedidoPendente && comanda.status === 'aberta'" class="alert alert-warning mb-4">
+        <div class="d-flex justify-content-between align-items-center">
+          <div>
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            <strong>Atenção!</strong> Você tem itens que ainda não foram enviados para a cozinha.
+          </div>
+          <button class="btn btn-warning" (click)="enviarParaCozinha()">
+            <i class="bi bi-send me-1"></i> Enviar para Cozinha
+          </button>
+        </div>
+      </div>
+
       <div class="card shadow-sm">
         <div class="card-header bg-primary text-white">
           <h5 class="mb-0">Itens da Comanda</h5>
@@ -157,8 +172,8 @@
                     <small *ngIf="item.observacao" class="text-muted">{{ item.observacao }}</small>
                   </td>
                   <td class="text-center">{{ item.quantidade }}</td>
-                  <td class="text-end">R$ {{ item.valor_unitario.toFixed(2) }}</td>
-                  <td class="text-end">R$ {{ item.valor_total.toFixed(2) }}</td>
+                  <td class="text-end">R$ {{ item.valor_unitario ? item.valor_unitario.toFixed(2) : '0.00' }}</td>
+                  <td class="text-end">R$ {{ item.valor_total ? item.valor_total.toFixed(2) : '0.00' }}</td>
                   <td *ngIf="comanda.status === 'aberta'">
                     <button class="btn btn-sm btn-outline-danger" (click)="removerItem(item.id)">
                       <i class="bi bi-trash"></i>
@@ -169,7 +184,7 @@
               <tfoot>
                 <tr>
                   <td colspan="3" class="text-end fw-bold">Total:</td>
-                  <td class="text-end fw-bold">R$ {{ comanda.total.toFixed(2) }}</td>
+                  <td class="text-end fw-bold">R$ {{ comanda.total ? comanda.total.toFixed(2) : '0.00' }}</td>
                   <td *ngIf="comanda.status === 'aberta'"></td>
                 </tr>
               </tfoot>

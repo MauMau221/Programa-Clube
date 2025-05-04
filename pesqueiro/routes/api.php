@@ -14,6 +14,12 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
+// Rota pública para produtos disponíveis (sem necessidade de autenticação)
+Route::get('/produto/disponiveis', [ProdutoController::class, "produtosDisponiveis"]);
+
+// Rota pública para visualização de pedidos em preparo e prontos (tela para clientes)
+Route::get('/pedidos/painel-cliente', [PedidoController::class, "painelCliente"]);
+
 // Rotas protegidas
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -36,11 +42,18 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/comanda/{id}', [ComandaController::class, "update"]);
         Route::put('/comanda/close/{id}', [ComandaController::class, "close"]);
         Route::put('/comanda/{id}/cancelar', [ComandaController::class, "cancel"]);
+        Route::get('/comanda/{id}/pedidos-pendentes', [ComandaController::class, "verificarPedidosPendentes"]);
+        
+        // Itens de Comanda
+        Route::post('/comanda/{id}/itens', [PedidoController::class, "adicionarItem"]);
+        Route::put('/comanda/{comandaId}/itens/{itemId}', [PedidoController::class, "atualizarItem"]);
+        Route::delete('/comanda/{comandaId}/itens/{itemId}', [PedidoController::class, "removerItem"]);
 
         //Pedido
         Route::post('/pedido/{id}', [PedidoController::class, "commandorder"]);
         Route::put('/pedido/{id}', [PedidoController::class, "update"]);
         Route::put('/pedido/{id}/cancel', [PedidoController::class, "cancel"]);
+        Route::put('/pedido/{id}/enviar-cozinha', [PedidoController::class, "enviarParaCozinha"]);
         Route::get('/comanda/{id}/pedidos', [PedidoController::class, "byComanda"]);
         Route::delete('/pedido/{pedidoId}/produto/{produtoId}', [PedidoController::class, "removeProduto"]);
         Route::put('/pedido/{pedidoId}/produto/{produtoId}', [PedidoController::class, "updateQuantidade"]);

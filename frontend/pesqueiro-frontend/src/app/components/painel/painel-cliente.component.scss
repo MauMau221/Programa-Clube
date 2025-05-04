@@ -1,0 +1,60 @@
+/* Estilo para o painel de clientes */
+:host {
+  display: block;
+  min-height: 100vh;
+  background-color: #f8f9fa;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Poppins', sans-serif;
+}
+
+.card {
+  transition: transform 0.3s;
+  border-radius: 8px;
+}
+
+.card-header {
+  border-radius: 8px 8px 0 0;
+}
+
+/* Adicionar uma animação suave para chamar atenção nos pedidos prontos */
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.02);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.border-success {
+  animation: pulse 2s infinite;
+}
+
+/* Estilos responsivos para telas grandes (TVs) */
+@media (min-width: 1200px) {
+  .container-fluid {
+    padding: 2rem 3rem;
+  }
+  
+  h1.display-4 {
+    font-size: 3.5rem;
+  }
+  
+  .card {
+    margin-bottom: 2rem;
+  }
+  
+  .card-header {
+    padding: 1rem;
+  }
+  
+  .list-group-item {
+    padding: 1rem;
+    font-size: 1.2rem;
+  }
+} 

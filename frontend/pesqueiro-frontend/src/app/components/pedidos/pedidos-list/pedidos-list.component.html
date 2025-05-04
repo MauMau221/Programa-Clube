@@ -25,6 +25,9 @@
             
             <input type="radio" class="btn-check" name="filtroStatus" id="pronto" [(ngModel)]="filtroStatus" value="pronto" (change)="aplicarFiltros()">
             <label class="btn btn-outline-success" for="pronto">Prontos</label>
+            
+            <input type="radio" class="btn-check" name="filtroStatus" id="entregue" [(ngModel)]="filtroStatus" value="entregue" (change)="aplicarFiltros()">
+            <label class="btn btn-outline-secondary" for="entregue">Entregues</label>
           </div>
         </div>
         <div class="col-md-6 text-end">

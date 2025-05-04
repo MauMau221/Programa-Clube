@@ -93,4 +93,9 @@ export class ComandaService {
   removerItem(comandaId: number, itemId: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/comanda/${comandaId}/itens/${itemId}`);
   }
+
+  // Verificar se a comanda tem pedidos pendentes de envio para a cozinha
+  verificarPedidosPendentes(comandaId: number): Observable<any> {
+    return this.http.get<any>(`${this.apiUrl}/comanda/${comandaId}/pedidos-pendentes`);
+  }
 } 

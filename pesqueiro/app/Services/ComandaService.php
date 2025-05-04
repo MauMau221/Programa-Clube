@@ -8,14 +8,19 @@ class ComandaService
 {
     public function criarComanda(array $dados)
     {
-        Comanda::create([
+        // Definir valores padrão para campos opcionais
+        $dados['status'] = $dados['status'] ?? 'aberta';
+        $dados['observacao'] = $dados['observacao'] ?? null;
+        
+        $comanda = Comanda::create([
             "total" => $dados['total'],
             "mesa" => $dados['mesa'],
             "status" => $dados['status'],
-            "observacao" => $dados['observacao'],
+            "observacao" => $dados['observacao'] ?? null,
             "cliente" => $dados['cliente'],
         ]);
-        return response()->json(["Comanda criada com sucesso"], 201);
+        
+        return $comanda;
     }
 
 
@@ -31,13 +36,13 @@ class ComandaService
 
         $comanda->total = $dados['total'];
         $comanda->mesa = $dados['mesa'];
-        $comanda->status = $dados['status'];
-        $comanda->observacao = $dados['observacao'];
+        $comanda->status = $dados['status'] ?? $comanda->status;
+        $comanda->observacao = $dados['observacao'] ?? $comanda->observacao;
         $comanda->cliente = $dados['cliente'];
 
         $comanda->save();
 
-        return response()->json(["Tudo certo"], 200);
+        return $comanda;
     
     }
 
@@ -48,6 +53,23 @@ class ComandaService
         $comanda->status = 'paga';
         $comanda->save();
 
-        return response()->json(["Comanda paga"], 200);
+        return $comanda;
+    }
+
+    public function cancelarComanda(int $comandaId)
+    {
+        $comanda = Comanda::findOrFail($comandaId);
+        
+        // Verificar se a comanda pode ser cancelada (apenas comandas abertas)
+        if ($comanda->status !== 'aberta') {
+            return response()->json([
+                'message' => 'Apenas comandas abertas podem ser canceladas'
+            ], 422);
+        }
+        
+        $comanda->status = 'cancelada';
+        $comanda->save();
+
+        return $comanda;
     }
 }

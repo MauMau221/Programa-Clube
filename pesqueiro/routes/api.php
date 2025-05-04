@@ -31,9 +31,11 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware('role:garcom,gerente')->group(function () {
         //Comanda
         Route::get('/comanda', [ComandaController::class, "index"]);
+        Route::get('/comanda/{id}', [ComandaController::class, "show"]);
         Route::post('/comanda', [ComandaController::class, "store"]);
         Route::put('/comanda/{id}', [ComandaController::class, "update"]);
         Route::put('/comanda/close/{id}', [ComandaController::class, "close"]);
+        Route::put('/comanda/{id}/cancelar', [ComandaController::class, "cancel"]);
 
         //Pedido
         Route::post('/pedido/{id}', [PedidoController::class, "commandorder"]);
@@ -52,6 +54,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/produto/{id}', [ProdutoController::class, "show"]);
         Route::put('/produto/{id}', [ProdutoController::class, "update"]);
         Route::delete('/produto/{id}', [ProdutoController::class, "destroy"]);
+        Route::put('/produto/{id}/disponibilidade', [ProdutoController::class, "atualizarDisponibilidade"]);
         Route::put('/produto/{id}/estoque', [ProdutoController::class, "atualizarEstoque"]);
         Route::put('/produto/{id}/estoque-minimo', [ProdutoController::class, "atualizarEstoqueMinimo"]);
         Route::get('/produto/categoria/{id}', [ProdutoController::class, "porCategoria"]);
@@ -76,6 +79,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/produtos/{produto}/historico', [EstoqueController::class, 'historico']);
         Route::get('/produtos/baixo', [EstoqueController::class, 'produtosComEstoqueBaixo']);
     });
+
+    // Rota para obter o saldo atual de estoque
+    Route::get('/estoque/produtos/{produtoId}/saldo', [EstoqueController::class, 'getSaldo']);
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

@@ -1,33 +1,40 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, importProvidersFrom } from '@angular/core';
 import { provideRouter } from '@angular/router';
-import { provideHttpClient, withInterceptors, HttpInterceptorFn } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
 import { routes } from './app.routes';
+import { provideClientHydration } from '@angular/platform-browser';
+import { authInterceptor } from './interceptors/auth.interceptor';
+import { errorInterceptor } from './interceptors/error.interceptor';
+import { EchoService } from './services/echo.service';
 
-// Definimos a função interceptadora com o tipo HttpInterceptorFn
-const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const token = localStorage.getItem('auth_token');
-  
-  if (token) {
-    // Clonamos a requisição e adicionamos o cabeçalho de autorização
-    req = req.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token}`
-      }
-    });
-  }
-  
-  return next(req);
-};
+// Providers para serviços
+import { AuthService } from './services/auth.service';
+import { NotificacaoService } from './services/notificacao.service';
+import { PedidoService } from './services/pedido.service';
+import { ComandaService } from './services/comanda.service';
+import { ProdutoService } from './services/produto.service';
+import { CategoriaService } from './services/categoria.service';
+import { EstoqueService } from './services/estoque.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideZoneChangeDetection({ eventCoalescing: true }), 
     provideRouter(routes),
+    provideClientHydration(),
     provideHttpClient(
       withInterceptors([
-        authInterceptor
+        authInterceptor,
+        errorInterceptor
       ])
-    )
+    ),
+    // Providers dos serviços
+    AuthService,
+    NotificacaoService,
+    PedidoService,
+    ComandaService,
+    ProdutoService,
+    CategoriaService,
+    EstoqueService,
+    EchoService
   ]
 };

@@ -11,6 +11,8 @@ export class AuthService {
   private apiUrl = environment.apiUrl;
   private userSubject = new BehaviorSubject<User | null>(null);
   public user$ = this.userSubject.asObservable();
+  private isLoggedInSubject = new BehaviorSubject<boolean>(false);
+  public isLoggedIn$ = this.isLoggedInSubject.asObservable();
   
   constructor(private http: HttpClient) {
     this.loadUserFromStorage();
@@ -59,12 +61,14 @@ export class AuthService {
     localStorage.setItem('auth_token', authResponse.token);
     localStorage.setItem('user', JSON.stringify(authResponse.user));
     this.userSubject.next(authResponse.user);
+    this.isLoggedInSubject.next(true);
   }
 
   private clearAuthData(): void {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user');
     this.userSubject.next(null);
+    this.isLoggedInSubject.next(false);
   }
 
   private loadUserFromStorage(): void {
@@ -73,6 +77,7 @@ export class AuthService {
       try {
         const user = JSON.parse(storedUser);
         this.userSubject.next(user);
+        this.isLoggedInSubject.next(true);
       } catch (error) {
         console.error('Erro ao carregar usuário do localStorage', error);
         this.clearAuthData();

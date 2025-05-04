@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { ProdutoService } from '../../services/produto.service';
 import { Produto } from '../../models/comanda.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-estoque-list',
@@ -12,7 +13,7 @@ import { Produto } from '../../models/comanda.model';
   templateUrl: './estoque-list.component.html',
   styleUrls: ['./estoque-list.component.scss']
 })
-export class EstoqueListComponent implements OnInit {
+export class EstoqueListComponent implements OnInit, OnDestroy {
   produtos: Produto[] = [];
   produtosFiltrados: Produto[] = [];
   isLoading = false;
@@ -21,68 +22,91 @@ export class EstoqueListComponent implements OnInit {
   termoBusca = '';
   filtroDisponibilidade = 'todos';
   filtroEstoque = 'todos';
+  
+  private produtoAtualizadoSubscription: Subscription | null = null;
 
   constructor(private produtoService: ProdutoService) { }
 
   ngOnInit(): void {
     this.carregarProdutos();
+    
+    // Inscrever-se para atualizações de produtos
+    this.produtoAtualizadoSubscription = this.produtoService.produtoAtualizado$.subscribe(
+      produtoId => {
+        if (produtoId) {
+          console.log(`EstoqueListComponent: Notificação de atualização para produto ${produtoId}`);
+          this.atualizarEstoqueProduto(produtoId);
+        }
+      }
+    );
+  }
+  
+  ngOnDestroy(): void {
+    if (this.produtoAtualizadoSubscription) {
+      this.produtoAtualizadoSubscription.unsubscribe();
+    }
+  }
+  
+  atualizarEstoqueProduto(produtoId: number): void {
+    // Primeiro encontrar o produto na lista
+    const produto = this.produtos.find(p => p.id === produtoId);
+    if (!produto) {
+      console.warn(`EstoqueList: Produto ${produtoId} não encontrado na lista de produtos.`);
+      return;
+    }
+    
+    console.log(`EstoqueList: Atualizando estoque do produto ${produtoId} (${produto.nome})`);
+    
+    // Buscar o estoque atualizado do produto
+    this.produtoService.atualizarEstoqueProduto(produtoId).subscribe({
+      next: (estoqueAtual) => {
+        console.log(`EstoqueList: Estoque atualizado do produto ${produtoId}: ${estoqueAtual}`);
+        
+        // Atualizar o produto na lista
+        if (estoqueAtual !== null && estoqueAtual !== undefined) {
+          produto.quantidade_estoque = estoqueAtual;
+          console.log(`EstoqueList: Quantidade atualizada no objeto: ${produto.quantidade_estoque}`);
+        } else {
+          console.warn(`EstoqueList: Recebido valor inválido para estoque: ${estoqueAtual}`);
+        }
+        
+        // Atualizar a lista filtrada também
+        const produtoFiltrado = this.produtosFiltrados.find(p => p.id === produtoId);
+        if (produtoFiltrado && estoqueAtual !== null && estoqueAtual !== undefined) {
+          produtoFiltrado.quantidade_estoque = estoqueAtual;
+          console.log(`EstoqueList: Quantidade atualizada no objeto filtrado: ${produtoFiltrado.quantidade_estoque}`);
+        }
+        
+        // Aplicar filtros para atualizar a visualização
+        this.aplicarFiltros();
+      },
+      error: (error) => {
+        console.error(`EstoqueList: Erro ao atualizar estoque do produto ${produtoId}:`, error);
+      }
+    });
   }
 
   carregarProdutos(): void {
     this.isLoading = true;
     this.produtoService.getProdutos().subscribe({
       next: (produtos) => {
-        console.log('Resposta original produtos (estoque):', JSON.stringify(produtos));
-        console.log('Produtos retornados para o estoque:', produtos);
-        
+        console.log('EstoqueList: Produtos carregados:', produtos.length);
         if (produtos.length > 0) {
-          const primeiroProduto = produtos[0];
-          console.log('Detalhes do primeiro produto no estoque:');
-          console.log('ID:', primeiroProduto.id);
-          console.log('Nome:', primeiroProduto.nome);
-          console.log('Preço:', primeiroProduto.preco, typeof primeiroProduto.preco);
-          console.log('Categoria ID:', primeiroProduto.categoria_id, typeof primeiroProduto.categoria_id);
-          console.log('Status:', primeiroProduto.status, typeof primeiroProduto.status);
-          console.log('Estoque mínimo:', primeiroProduto.estoque_minimo, typeof primeiroProduto.estoque_minimo);
-          console.log('Quantidade em estoque:', primeiroProduto.quantidade_estoque, typeof primeiroProduto.quantidade_estoque);
-          console.log('Observação:', primeiroProduto.observacao, typeof primeiroProduto.observacao);
-          console.log('Todos os campos do produto no estoque:', Object.keys(primeiroProduto));
+          console.log('EstoqueList: Amostra do primeiro produto:', 
+            `ID=${produtos[0].id}, Nome=${produtos[0].nome}, Estoque=${produtos[0].quantidade_estoque}`);
         }
         
-        // Garantir que todos os produtos tenham os campos necessários
-        this.produtos = produtos.map(produto => {
-          // Se não tiver preço, definimos um valor padrão
-          if (produto.preco === undefined || produto.preco === null) {
-            console.log(`Produto ${produto.id} sem preço definido no estoque`);
-            produto.preco = 0;
-          }
-          
-          // Se não tiver status, definimos como indisponível
-          if (produto.status === undefined || produto.status === null) {
-            console.log(`Produto ${produto.id} sem status definido no estoque`);
-            produto.status = 'indisponivel';
-          }
-          
-          // Se não tiver quantidade em estoque, definimos como 0
-          if (produto.quantidade_estoque === undefined || produto.quantidade_estoque === null) {
-            console.log(`Produto ${produto.id} sem quantidade de estoque definida`);
-            produto.quantidade_estoque = 0;
-          }
-          
-          // Se não tiver estoque mínimo, definimos o padrão como 5
-          if (produto.estoque_minimo === undefined || produto.estoque_minimo === null) {
-            console.log(`Produto ${produto.id} sem estoque mínimo definido`);
-            produto.estoque_minimo = 5;
-          }
-          
-          return produto;
-        });
-        
+        this.produtos = produtos;
         this.aplicarFiltros();
+        
+        // Buscar saldo de estoque atualizado para todos os produtos
+        console.log('EstoqueList: Buscando saldo de estoque atualizado para todos os produtos');
+        this.produtoService.atualizarEstoqueTodosProdutos(this.produtos);
+        
         this.isLoading = false;
       },
       error: (error) => {
-        console.error('Erro ao carregar produtos para estoque:', error);
+        console.error('EstoqueList: Erro ao carregar produtos:', error);
         this.mensagem = 'Erro ao carregar produtos. Tente novamente mais tarde.';
         this.tipoMensagem = 'danger';
         this.isLoading = false;

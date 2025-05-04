@@ -5,6 +5,8 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { EstoqueService } from '../../services/estoque.service';
 import { ProdutoService } from '../../services/produto.service';
 import { Produto } from '../../models/comanda.model';
+import { EstoqueResponse } from '../../models/estoque.model';
+import { NotificacaoService } from '../../services/notificacao.service';
 
 @Component({
   selector: 'app-estoque-movimentacao',
@@ -27,12 +29,13 @@ export class EstoqueMovimentacaoComponent implements OnInit {
     private estoqueService: EstoqueService,
     private produtoService: ProdutoService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private notificacaoService: NotificacaoService
   ) {
     this.movimentacaoForm = this.fb.group({
       produto_id: ['', Validators.required],
       quantidade: [1, [Validators.required, Validators.min(1)]],
-      motivo: ['']
+      motivo: ['', Validators.required]
     });
   }
 
@@ -65,8 +68,10 @@ export class EstoqueMovimentacaoComponent implements OnInit {
 
   carregarDetalhesProduto(produtoId: number): void {
     this.isLoading = true;
+    console.log(`Recarregando detalhes do produto ID: ${produtoId}`);
     this.produtoService.getProduto(produtoId).subscribe({
       next: (produto) => {
+        console.log(`Detalhes do produto ID ${produtoId} recebidos:`, produto);
         this.produtoSelecionado = produto;
         this.isLoading = false;
       },
@@ -112,16 +117,34 @@ export class EstoqueMovimentacaoComponent implements OnInit {
 
   adicionarEstoque(produtoId: number, quantidade: number, motivo?: string): void {
     this.estoqueService.adicionarEstoque(produtoId, quantidade, motivo).subscribe({
-      next: () => {
+      next: (response) => {
         this.isLoading = false;
         this.mensagem = `${quantidade} unidades adicionadas ao estoque com sucesso!`;
         this.tipoMensagem = 'success';
-        this.resetForm();
         
-        // Recarrega o produto para exibir o estoque atualizado
-        if (produtoId) {
+        console.log(`Estoque adicionado com sucesso. Resposta:`, response);
+        
+        // Atualizar a quantidade de estoque do produto selecionado
+        if (this.produtoSelecionado) {
+          console.log(`Atualizando estoque do produto selecionado de ${this.produtoSelecionado.quantidade_estoque} para ${response.estoque_atual}`);
+          this.produtoSelecionado.quantidade_estoque = response.estoque_atual || 0;
+          
+          // Notificar outros componentes sobre a atualização
+          this.produtoService.notificarProdutoAtualizado(produtoId);
+          
+          // Adicionar notificação sobre atualização de estoque
+          this.notificacaoService.adicionarNotificacao({
+            tipo: 'estoque',
+            subtipo: 'entrada',
+            titulo: 'Estoque Atualizado',
+            mensagem: `${quantidade} unidades adicionadas ao estoque de ${this.produtoSelecionado.nome}. Estoque atual: ${response.estoque_atual}`
+          });
+          
+          // Recarregar detalhes do produto após a atualização
           this.carregarDetalhesProduto(produtoId);
         }
+        
+        this.resetForm();
       },
       error: (error) => {
         console.error('Erro ao adicionar estoque:', error);
@@ -134,16 +157,45 @@ export class EstoqueMovimentacaoComponent implements OnInit {
 
   removerEstoque(produtoId: number, quantidade: number, motivo?: string): void {
     this.estoqueService.removerEstoque(produtoId, quantidade, motivo).subscribe({
-      next: () => {
+      next: (response) => {
         this.isLoading = false;
         this.mensagem = `${quantidade} unidades removidas do estoque com sucesso!`;
         this.tipoMensagem = 'success';
-        this.resetForm();
         
-        // Recarrega o produto para exibir o estoque atualizado
-        if (produtoId) {
+        console.log(`Estoque removido com sucesso. Resposta:`, response);
+        
+        // Atualizar a quantidade de estoque do produto selecionado
+        if (this.produtoSelecionado) {
+          console.log(`Atualizando estoque do produto selecionado de ${this.produtoSelecionado.quantidade_estoque} para ${response.estoque_atual}`);
+          this.produtoSelecionado.quantidade_estoque = response.estoque_atual || 0;
+          
+          // Notificar outros componentes sobre a atualização
+          this.produtoService.notificarProdutoAtualizado(produtoId);
+          
+          // Adicionar notificação sobre atualização de estoque
+          this.notificacaoService.adicionarNotificacao({
+            tipo: 'estoque',
+            subtipo: 'saida',
+            titulo: 'Estoque Atualizado',
+            mensagem: `${quantidade} unidades removidas do estoque de ${this.produtoSelecionado.nome}. Estoque atual: ${response.estoque_atual}`
+          });
+          
+          // Se tiver alerta de estoque baixo, mostrar também
+          if (response.alerta) {
+            this.notificacaoService.adicionarNotificacao({
+              tipo: 'estoque',
+              subtipo: 'estoque_baixo',
+              titulo: 'Alerta de Estoque Baixo',
+              mensagem: response.alerta.mensagem,
+              link: '/estoque/baixo'
+            });
+          }
+          
+          // Recarregar detalhes do produto após a atualização
           this.carregarDetalhesProduto(produtoId);
         }
+        
+        this.resetForm();
       },
       error: (error) => {
         console.error('Erro ao remover estoque:', error);

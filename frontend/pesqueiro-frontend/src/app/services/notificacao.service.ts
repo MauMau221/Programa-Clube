@@ -8,6 +8,7 @@ import { PedidoService } from './pedido.service';
 export interface Notificacao {
   id: number;
   tipo: 'pedido' | 'estoque' | 'sistema';
+  subtipo?: 'entrada' | 'saida' | 'estoque_baixo' | 'alerta' | 'info';
   titulo: string;
   mensagem: string;
   lida: boolean;
@@ -23,23 +24,31 @@ export class NotificacaoService {
   private apiUrl = environment.apiUrl;
   private notificacoesSubject = new BehaviorSubject<Notificacao[]>([]);
   private pedidosPendentesSubject = new BehaviorSubject<number>(0);
+  private notificacaoSomSubject = new BehaviorSubject<boolean>(false);
   
   notificacoes$ = this.notificacoesSubject.asObservable();
   pedidosPendentes$ = this.pedidosPendentesSubject.asObservable();
+  notificacaoSom$ = this.notificacaoSomSubject.asObservable();
   
   private polling: any;
+  private audio: HTMLAudioElement;
 
   constructor(
     private http: HttpClient,
     private pedidoService: PedidoService
   ) {
-    // Inicia o polling quando o serviço for criado
+    // Inicializa o áudio de notificação
+    this.audio = new Audio();
+    this.audio.src = 'assets/sounds/notification.mp3';
+    this.audio.load();
+    
+    // Inicia o polling quando o serviço for criado - será mantido como backup
     this.iniciarPolling();
   }
 
   private iniciarPolling(): void {
-    // Verifica a cada 30 segundos por novos pedidos pendentes
-    this.polling = interval(30000).pipe(
+    // Verifica a cada 60 segundos por novos pedidos pendentes (como backup)
+    this.polling = interval(60000).pipe(
       switchMap(() => this.verificarPedidosPendentes())
     ).subscribe();
 
@@ -66,29 +75,65 @@ export class NotificacaoService {
             link: '/pedidos'
           };
           
-          // Adiciona apenas se não houver uma notificação similar
+          // Adiciona apenas se não houver uma notificação similar nos últimos 5 minutos
+          const cincoMinutosAtras = new Date(Date.now() - 5 * 60 * 1000);
           const existeNotificacao = notificacoesAtuais.some(
-            n => n.tipo === 'pedido' && n.titulo === 'Pedidos Pendentes'
+            n => n.tipo === 'pedido' && 
+                 n.titulo === 'Pedidos Pendentes' && 
+                 new Date(n.data) > cincoMinutosAtras
           );
           
           if (!existeNotificacao) {
-            this.notificacoesSubject.next([novaNotificacao, ...notificacoesAtuais]);
+            this.adicionarNotificacao(novaNotificacao);
           }
         }
       })
     );
   }
 
-  adicionarNotificacao(notificacao: Omit<Notificacao, 'id' | 'data' | 'lida'>): void {
+  adicionarNotificacao(notificacao: Partial<Notificacao>): void {
     const notificacoesAtuais = this.notificacoesSubject.value;
     const novaNotificacao: Notificacao = {
-      ...notificacao,
-      id: new Date().getTime(),
-      data: new Date(),
-      lida: false
+      ...notificacao as any,
+      id: notificacao.id || new Date().getTime(),
+      data: notificacao.data || new Date(),
+      lida: notificacao.lida || false,
+      tipo: notificacao.tipo || 'sistema',
+      titulo: notificacao.titulo || 'Notificação',
+      mensagem: notificacao.mensagem || ''
     };
     
     this.notificacoesSubject.next([novaNotificacao, ...notificacoesAtuais]);
+    
+    // Toca o som de notificação
+    this.tocarSomNotificacao();
+    
+    // Mostra notificação no navegador se suportado
+    this.mostrarNotificacaoNavegador(novaNotificacao);
+  }
+
+  private tocarSomNotificacao(): void {
+    // Reproduz o som e emite um evento de som tocado
+    if (this.audio) {
+      this.audio.play().then(() => {
+        this.notificacaoSomSubject.next(true);
+        setTimeout(() => this.notificacaoSomSubject.next(false), 1000);
+      }).catch(error => console.error('Erro ao tocar som de notificação:', error));
+    }
+  }
+
+  private mostrarNotificacaoNavegador(notificacao: Notificacao): void {
+    // Verifica se as notificações são suportadas e permitidas
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification(notificacao.titulo, {
+        body: notificacao.mensagem,
+        icon: 'assets/icons/logo.png'
+      });
+    } 
+    // Solicita permissão se ainda não foi concedida
+    else if ('Notification' in window && Notification.permission !== 'denied') {
+      Notification.requestPermission();
+    }
   }
 
   marcarComoLida(id: number): void {

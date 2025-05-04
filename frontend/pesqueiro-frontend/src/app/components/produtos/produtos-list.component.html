@@ -73,6 +73,11 @@
           <p class="card-text small" *ngIf="produto.estoque_minimo !== undefined && produto.estoque_minimo !== null">
             Estoque mínimo: {{ produto.estoque_minimo }}
           </p>
+          <p class="card-text small">
+            Estoque atual: <span [ngClass]="{'text-danger': produto.quantidade_estoque !== undefined && produto.quantidade_estoque < (produto.estoque_minimo || 5), 'text-success': produto.quantidade_estoque !== undefined && produto.quantidade_estoque >= (produto.estoque_minimo || 5)}">
+              {{ produto.quantidade_estoque !== undefined ? produto.quantidade_estoque : 0 }}
+            </span>
+          </p>
         </div>
         <div class="card-footer bg-transparent d-flex justify-content-between">
           <button 

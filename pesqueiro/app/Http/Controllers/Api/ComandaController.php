@@ -32,8 +32,32 @@ class ComandaController extends Controller
 
     public function show(string $id)
     {
-        $comanda = Comanda::findOrFail($id);
-        return response()->json($comanda, 200);
+        $comanda = Comanda::with('pedidos.produtos')->findOrFail($id);
+        
+        // Transformar dados dos pedidos para itens da comanda
+        $itens = [];
+        foreach ($comanda->pedidos as $pedido) {
+            foreach ($pedido->produtos as $produto) {
+                $itens[] = [
+                    'id' => $produto->pivot->id,
+                    'comanda_id' => $comanda->id,
+                    'produto_id' => $produto->id,
+                    'produto' => $produto,
+                    'quantidade' => $produto->pivot->quantidade,
+                    'valor_unitario' => $produto->preco,
+                    'valor_total' => $produto->preco * $produto->pivot->quantidade,
+                    'observacao' => $produto->pivot->observacao ?? null,
+                    'created_at' => $produto->pivot->created_at,
+                    'updated_at' => $produto->pivot->updated_at
+                ];
+            }
+        }
+        
+        // Adicionar os itens à resposta
+        $resposta = $comanda->toArray();
+        $resposta['itens'] = $itens;
+        
+        return response()->json($resposta, 200);
     }
 
     public function update(ComandaRequest $request, string $comandaId)
@@ -46,6 +70,12 @@ class ComandaController extends Controller
     public function close(string $comandaId)
     {
         $comanda = $this->comandaService->fecharComanda($comandaId);
+        return response()->json($comanda, 200);
+    }
+
+    public function cancel(string $comandaId)
+    {
+        $comanda = $this->comandaService->cancelarComanda($comandaId);
         return response()->json($comanda, 200);
     }
 }

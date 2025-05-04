@@ -14,12 +14,26 @@ class EstoqueMovimentacao extends Model
     protected $fillable = [
         'produto_id',
         'quantidade',
+        'quantidade_anterior',
+        'quantidade_atual',
         'tipo',
-        'motivo'
+        'motivo',
+        'usuario_id'
+    ];
+
+    protected $casts = [
+        'quantidade' => 'integer',
+        'quantidade_anterior' => 'integer',
+        'quantidade_atual' => 'integer',
     ];
 
     public function produto()
     {
         return $this->belongsTo(Produto::class);
+    }
+
+    public function usuario()
+    {
+        return $this->belongsTo(User::class);
     }
 } 

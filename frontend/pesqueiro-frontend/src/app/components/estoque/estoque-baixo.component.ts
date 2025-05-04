@@ -30,15 +30,28 @@ export class EstoqueBaixoComponent implements OnInit {
   carregarProdutosBaixoEstoque(): void {
     this.isLoading = true;
     this.mensagem = '';
+    console.log('Carregando produtos com estoque baixo...');
     
     this.estoqueService.getProdutosEstoqueBaixo().subscribe({
       next: (produtos) => {
+        console.log('Resposta processada de produtos com estoque baixo:', produtos);
         this.produtos = produtos;
         this.isLoading = false;
         
         if (produtos.length === 0) {
+          console.log('Nenhum produto com estoque baixo encontrado');
           this.mensagem = 'Não há produtos com estoque abaixo do mínimo.';
           this.tipoMensagem = 'success';
+        } else {
+          console.log(`Encontrados ${produtos.length} produtos com estoque baixo`);
+        }
+        
+        // Verificar se há produtos com estoque menor que o mínimo
+        const produtosComEstoqueBaixo = this.verificarProdutosEstoqueBaixo();
+        if (produtosComEstoqueBaixo.length > 0 && this.produtos.length === 0) {
+          console.warn('Detectados produtos com estoque baixo mas não foram exibidos:', produtosComEstoqueBaixo);
+          // Adicionar produtos manualmente se a API não retornou
+          this.produtos = produtosComEstoqueBaixo;
         }
       },
       error: (error) => {
@@ -46,14 +59,62 @@ export class EstoqueBaixoComponent implements OnInit {
         this.mensagem = 'Erro ao carregar produtos com estoque baixo. Tente novamente mais tarde.';
         this.tipoMensagem = 'danger';
         this.isLoading = false;
+        
+        // Tentar carregar lista de produtos e filtrar manualmente
+        this.carregarTodosProdutosEFiltrar();
       }
+    });
+  }
+  
+  // Método de fallback que busca todos os produtos e filtra os que têm estoque baixo
+  carregarTodosProdutosEFiltrar(): void {
+    console.log('Usando método alternativo para buscar produtos com estoque baixo...');
+    this.produtoService.getProdutos().subscribe({
+      next: (produtos) => {
+        console.log('Produtos carregados para filtragem manual:', produtos.length);
+        this.produtos = this.verificarProdutosEstoqueBaixo(produtos);
+        
+        if (this.produtos.length === 0) {
+          this.mensagem = 'Não há produtos com estoque abaixo do mínimo.';
+          this.tipoMensagem = 'success';
+        } else {
+          console.log(`Encontrados ${this.produtos.length} produtos com estoque baixo via método alternativo`);
+          this.mensagem = '';
+        }
+        
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Erro ao carregar produtos para filtrar:', error);
+        this.isLoading = false;
+      }
+    });
+  }
+  
+  // Função para verificar produtos com estoque baixo
+  verificarProdutosEstoqueBaixo(listaProdutos?: Produto[]): Produto[] {
+    const produtos = listaProdutos || [];
+    console.log(`Verificando ${produtos.length} produtos para filtrar por estoque baixo`);
+    
+    return produtos.filter((produto: Produto) => {
+      // Garantir que quantidade_estoque tenha um valor padrão se for undefined
+      const quantidadeEstoque = produto.quantidade_estoque ?? 0;
+      
+      // Considerar estoque baixo se estiver abaixo do mínimo ou se for zero
+      const estoqueBaixo = 
+        quantidadeEstoque <= 0 || 
+        (produto.estoque_minimo && quantidadeEstoque < produto.estoque_minimo);
+      
+      if (estoqueBaixo) {
+        console.log(`Produto ${produto.id} (${produto.nome}) com estoque baixo: ${quantidadeEstoque}/${produto.estoque_minimo || 'não definido'}`);
+      }
+      
+      return estoqueBaixo;
     });
   }
 
   adicionarEstoque(produto: Produto): void {
-    // Esta função será implementada na tela de movimentação de estoque
-    // Por enquanto, apenas redireciona para a tela de adição de estoque
-    // com o ID do produto pré-selecionado
+    // Redireciona para a tela de adição de estoque com o ID do produto pré-selecionado
   }
 
   limparMensagem(): void {

@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Produto;
 use App\Models\EstoqueMovimentacao;
+use App\Models\EstoqueSaldo;
 use Illuminate\Support\Facades\DB;
 use Exception;
 
@@ -25,11 +26,24 @@ class EstoqueService
         }
 
         return DB::transaction(function () use ($produto, $quantidade, $motivo) {
-            return $produto->movimentacoes()->create([
+            // Obter saldo atual
+            $estoqueAtual = $this->getSaldoAtual($produto);
+            $novoSaldo = $estoqueAtual + $quantidade;
+            
+            // Registrar movimentação
+            $movimentacao = $produto->movimentacoes()->create([
                 'quantidade' => $quantidade,
+                'quantidade_anterior' => $estoqueAtual,
+                'quantidade_atual' => $novoSaldo,
                 'tipo' => 'entrada',
-                'motivo' => $motivo
+                'motivo' => $motivo,
+                'usuario_id' => auth()->id()
             ]);
+            
+            // Atualizar saldo consolidado usando o método estático que já trata a chave primária corretamente
+            EstoqueSaldo::atualizarOuCriarSaldo($produto->id, $novoSaldo);
+            
+            return $movimentacao;
         });
     }
 
@@ -48,17 +62,28 @@ class EstoqueService
             throw new Exception('A quantidade deve ser maior que zero');
         }
 
-        $estoqueAtual = $produto->estoque_atual;
+        $estoqueAtual = $this->getSaldoAtual($produto);
         if ($estoqueAtual < $quantidade) {
             throw new Exception('Quantidade insuficiente em estoque');
         }
 
-        return DB::transaction(function () use ($produto, $quantidade, $motivo) {
-            return $produto->movimentacoes()->create([
+        return DB::transaction(function () use ($produto, $quantidade, $motivo, $estoqueAtual) {
+            $novoSaldo = $estoqueAtual - $quantidade;
+            
+            // Registrar movimentação
+            $movimentacao = $produto->movimentacoes()->create([
                 'quantidade' => $quantidade,
+                'quantidade_anterior' => $estoqueAtual,
+                'quantidade_atual' => $novoSaldo,
                 'tipo' => 'saida',
-                'motivo' => $motivo
+                'motivo' => $motivo,
+                'usuario_id' => auth()->id()
             ]);
+            
+            // Atualizar saldo consolidado
+            EstoqueSaldo::atualizarOuCriarSaldo($produto->id, $novoSaldo);
+            
+            return $movimentacao;
         });
     }
 
@@ -85,7 +110,18 @@ class EstoqueService
      */
     public function getSaldoAtual(Produto $produto): int
     {
-        return $produto->estoque_atual;
+        // Buscar da tabela de saldos primeiro (mais eficiente)
+        $saldo = EstoqueSaldo::where('produto_id', $produto->id)->first();
+        
+        if ($saldo) {
+            return $saldo->quantidade;
+        }
+        
+        // Se não encontrar, calcular o saldo a partir das movimentações
+        $entradas = $produto->movimentacoes()->where('tipo', 'entrada')->sum('quantidade');
+        $saidas = $produto->movimentacoes()->where('tipo', 'saida')->sum('quantidade');
+        
+        return $entradas - $saidas;
     }
 
     /**

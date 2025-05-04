@@ -31,22 +31,26 @@
                 formControlName="mesa" 
                 class="form-control" 
                 [ngClass]="{'is-invalid': comandaForm.get('mesa')?.invalid && comandaForm.get('mesa')?.touched}"
-                placeholder="Número da mesa ou identificação"
+                placeholder="Número ou nome da mesa"
               />
               <div class="invalid-feedback" *ngIf="comandaForm.get('mesa')?.errors?.['required'] && comandaForm.get('mesa')?.touched">
-                Mesa é obrigatório
+                Mesa é obrigatória
               </div>
             </div>
 
             <div class="mb-3">
-              <label for="cliente" class="form-label">Cliente</label>
+              <label for="cliente" class="form-label">Cliente*</label>
               <input 
                 type="text" 
                 id="cliente" 
                 formControlName="cliente" 
                 class="form-control" 
-                placeholder="Nome do cliente (opcional)"
+                [ngClass]="{'is-invalid': comandaForm.get('cliente')?.invalid && comandaForm.get('cliente')?.touched}"
+                placeholder="Nome do cliente"
               />
+              <div class="invalid-feedback" *ngIf="comandaForm.get('cliente')?.errors?.['required'] && comandaForm.get('cliente')?.touched">
+                Nome do cliente é obrigatório
+              </div>
             </div>
 
             <div class="d-grid gap-2">

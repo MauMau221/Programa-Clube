@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { User } from '../../models/user.model';
-import { NotificacoesComponent } from './notificacoes/notificacoes.component';
+import { NotificacoesComponent } from './notificacoes.component';
 
 @Component({
   selector: 'app-nav-bar',

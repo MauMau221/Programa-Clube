@@ -34,6 +34,10 @@ class ProdutoService
     public function buscarProduto(int $produtoId)
     {
         $produto = Produto::with('categoria')->findOrFail($produtoId);
+        
+        // Adicionar o campo quantidade_estoque à resposta
+        $produto->quantidade_estoque = $produto->estoque_atual;
+        
         return response()->json($produto, 200);  
     }
 

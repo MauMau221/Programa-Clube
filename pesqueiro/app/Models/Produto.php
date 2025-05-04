@@ -38,8 +38,21 @@ class Produto extends Model
         return $this->hasMany(EstoqueMovimentacao::class);
     }
 
+    public function saldoEstoque()
+    {
+        return $this->hasOne(EstoqueSaldo::class);
+    }
+
     public function getEstoqueAtualAttribute()
     {
+        // Primeiro tenta buscar da tabela de saldos para melhor desempenho
+        $saldo = $this->saldoEstoque;
+        
+        if ($saldo) {
+            return $saldo->quantidade;
+        }
+        
+        // Se não encontrar saldo, calcula a partir das movimentações
         $entradas = $this->movimentacoes()->where('tipo', 'entrada')->sum('quantidade');
         $saidas = $this->movimentacoes()->where('tipo', 'saida')->sum('quantidade');
         return $entradas - $saidas;

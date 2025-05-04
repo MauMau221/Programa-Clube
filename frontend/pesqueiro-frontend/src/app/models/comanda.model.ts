@@ -3,7 +3,7 @@ export interface Comanda {
   mesa: string;
   cliente?: string;
   status: 'aberta' | 'fechada' | 'cancelada';
-  valor_total: number;
+  total: number;
   created_at: string;
   updated_at: string;
   itens?: ComandaItem[];
@@ -26,14 +26,17 @@ export interface Produto {
   id: number;
   nome: string;
   preco: number;
+  descricao?: string;
   categoria_id: number;
+  imagem?: string;
+  ativo: boolean;
   categoria?: Categoria;
-  status: 'disponivel' | 'indisponivel';
+  status?: 'disponivel' | 'indisponivel';
   observacao?: string;
-  estoque_minimo: number;
+  estoque_minimo?: number;
   quantidade_estoque?: number;
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface Categoria {
@@ -53,10 +56,14 @@ export interface EstoqueMovimento {
   quantidade: number;
   quantidade_anterior: number;
   quantidade_atual: number;
+  estoque_atual?: number;
   motivo?: string;
   usuario_id: number;
   usuario_nome?: string;
   created_at: string;
+  alerta?: {
+    mensagem: string;
+  };
 }
 
 export interface EstoqueHistorico {

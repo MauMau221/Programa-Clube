@@ -21,6 +21,12 @@ class ProdutoController extends Controller
     public function index()
     {
         $produtos = Produto::with('categoria')->get();
+        
+        // Adicionar o campo quantidade_estoque a cada produto
+        foreach ($produtos as $produto) {
+            $produto->quantidade_estoque = $produto->estoque_atual;
+        }
+        
         return response()->json($produtos, 200);
     }
 
@@ -68,6 +74,22 @@ class ProdutoController extends Controller
         ]);
 
         return $this->produtoService->atualizarEstoque($produtoId, $request->quantidade);
+    }
+
+    public function atualizarDisponibilidade(Request $request, string $produtoId)
+    {
+        $request->validate([
+            'status' => 'required|in:disponivel,indisponivel'
+        ]);
+        
+        $produto = Produto::findOrFail($produtoId);
+        $produto->status = $request->status;
+        $produto->save();
+        
+        return response()->json([
+            'message' => 'Disponibilidade atualizada com sucesso',
+            'produto' => $produto
+        ], 200);
     }
 
     public function porCategoria(string $categoriaId)

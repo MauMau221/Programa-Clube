@@ -28,7 +28,7 @@ export class ComandaFormComponent implements OnInit {
   ) {
     this.comandaForm = this.fb.group({
       mesa: ['', [Validators.required]],
-      cliente: ['']
+      cliente: ['', [Validators.required]]
     });
   }
 
@@ -49,7 +49,9 @@ export class ComandaFormComponent implements OnInit {
       next: (comanda) => {
         this.comandaForm.patchValue({
           mesa: comanda.mesa,
-          cliente: comanda.cliente
+          cliente: comanda.cliente,
+          total: comanda.total,
+          status: comanda.status
         });
         this.isLoading = false;
       },
@@ -78,15 +80,42 @@ export class ComandaFormComponent implements OnInit {
   }
 
   criarComanda(): void {
-    const comandaData = this.comandaForm.value;
+    const formData = this.comandaForm.value;
+    
+    const comandaData = {
+      mesa: String(formData.mesa),  // Garantir que a mesa seja uma string
+      cliente: formData.cliente,
+      total: 0  // Valor inicial zero para novas comandas
+    };
+    
+    console.log('Enviando dados da comanda:', comandaData);
+    
     this.comandaService.criarComanda(comandaData).subscribe({
       next: (comanda) => {
+        console.log('Comanda criada com sucesso:', comanda);
         this.isLoading = false;
         this.router.navigate(['/comandas', comanda.id]);
       },
       error: (error) => {
-        console.error('Erro ao criar comanda:', error);
-        this.mensagem = 'Erro ao criar comanda. Tente novamente.';
+        console.error('Erro detalhado ao criar comanda:', error);
+        let mensagemErro = 'Erro ao criar comanda.';
+        
+        if (error.error && typeof error.error === 'object') {
+          // Extrair mensagens de erro do objeto de resposta
+          const mensagens = [];
+          for (const campo in error.error.errors) {
+            if (error.error.errors[campo]) {
+              mensagens.push(error.error.errors[campo][0]);
+            }
+          }
+          if (mensagens.length > 0) {
+            mensagemErro = `${mensagemErro} ${mensagens.join(' ')}`;
+          }
+        } else if (error.message) {
+          mensagemErro = `${mensagemErro} ${error.message}`;
+        }
+        
+        this.mensagem = mensagemErro;
         this.tipoMensagem = 'danger';
         this.isLoading = false;
       }
@@ -96,7 +125,14 @@ export class ComandaFormComponent implements OnInit {
   atualizarComanda(): void {
     if (!this.comandaId) return;
 
-    const comandaData = this.comandaForm.value;
+    const formData = this.comandaForm.value;
+    
+    const comandaData = {
+      mesa: String(formData.mesa),  // Garantir que a mesa seja uma string
+      cliente: formData.cliente,
+      total: formData.total || 0
+    };
+    
     this.comandaService.atualizarComanda(this.comandaId, comandaData).subscribe({
       next: () => {
         this.isLoading = false;

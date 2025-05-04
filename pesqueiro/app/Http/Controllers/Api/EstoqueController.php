@@ -184,4 +184,34 @@ class EstoqueController extends Controller
             ], 500);
         }
     }
+
+    /**
+     * Obtém o saldo atual do estoque de um produto
+     *
+     * @param int $produtoId
+     * @return JsonResponse
+     */
+    public function getSaldo(int $produtoId): JsonResponse
+    {
+        try {
+            // Verifica se o produto existe
+            if (!Produto::where('id', $produtoId)->exists()) {
+                return response()->json([
+                    'message' => 'Produto não encontrado'
+                ], 404);
+            }
+            
+            $produto = Produto::findOrFail($produtoId);
+            $saldoAtual = $this->estoqueService->getSaldoAtual($produto);
+
+            return response()->json([
+                'estoque_atual' => $saldoAtual
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erro ao obter saldo do estoque: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 } 

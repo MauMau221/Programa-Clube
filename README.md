@@ -46,7 +46,7 @@ Crie um arquivo `.env` na pasta `pesqueiro/` com o seguinte conteúdo:
 ```
 APP_NAME=Laravel
 APP_ENV=local
-APP_KEY=base64:1D6K/bI6zcB0+oNPpIiOstcIUnJ+z9euycu/Bx3O/Ok=
+APP_KEY=base64:
 APP_DEBUG=true
 APP_URL=http://localhost
 

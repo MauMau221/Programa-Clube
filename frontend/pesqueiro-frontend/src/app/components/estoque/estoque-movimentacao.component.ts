@@ -140,6 +140,17 @@ export class EstoqueMovimentacaoComponent implements OnInit {
             mensagem: `${quantidade} unidades adicionadas ao estoque de ${this.produtoSelecionado.nome}. Estoque atual: ${response.estoque_atual}`
           });
           
+          // Se tiver alerta de estoque baixo, mostrar também
+          if (response.alerta) {
+            this.notificacaoService.adicionarNotificacao({
+              tipo: 'estoque',
+              subtipo: 'estoque_baixo',
+              titulo: 'Alerta de Estoque Baixo',
+              mensagem: response.alerta.mensagem,
+              link: '/estoque/baixo'
+            });
+          }
+          
           // Recarregar detalhes do produto após a atualização
           this.carregarDetalhesProduto(produtoId);
         }

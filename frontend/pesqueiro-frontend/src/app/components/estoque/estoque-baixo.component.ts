@@ -35,7 +35,21 @@ export class EstoqueBaixoComponent implements OnInit {
     this.estoqueService.getProdutosEstoqueBaixo().subscribe({
       next: (produtos) => {
         console.log('Resposta processada de produtos com estoque baixo:', produtos);
-        this.produtos = produtos;
+        
+        // Ordenar produtos: primeiro os esgotados, depois os com estoque baixo
+        this.produtos = produtos.sort((a, b) => {
+          // Se a.status_estoque é 'esgotado', deve vir antes de b
+          if (a.status_estoque === 'esgotado' && b.status_estoque !== 'esgotado') {
+            return -1;
+          }
+          // Se b.status_estoque é 'esgotado', deve vir antes de a
+          if (a.status_estoque !== 'esgotado' && b.status_estoque === 'esgotado') {
+            return 1;
+          }
+          // Se ambos têm o mesmo status, ordenar por nome
+          return a.nome.localeCompare(b.nome);
+        });
+        
         this.isLoading = false;
         
         if (produtos.length === 0) {
@@ -43,7 +57,9 @@ export class EstoqueBaixoComponent implements OnInit {
           this.mensagem = 'Não há produtos com estoque abaixo do mínimo.';
           this.tipoMensagem = 'success';
         } else {
-          console.log(`Encontrados ${produtos.length} produtos com estoque baixo`);
+          const produtosEsgotados = produtos.filter(p => p.status_estoque === 'esgotado');
+          const produtosBaixos = produtos.filter(p => p.status_estoque === 'baixo');
+          console.log(`Encontrados ${produtosEsgotados.length} produtos esgotados e ${produtosBaixos.length} com estoque baixo`);
         }
         
         // Verificar se há produtos com estoque menor que o mínimo
@@ -72,7 +88,16 @@ export class EstoqueBaixoComponent implements OnInit {
     this.produtoService.getProdutos().subscribe({
       next: (produtos) => {
         console.log('Produtos carregados para filtragem manual:', produtos.length);
-        this.produtos = this.verificarProdutosEstoqueBaixo(produtos);
+        this.produtos = this.verificarProdutosEstoqueBaixo(produtos).sort((a, b) => {
+          // Primeiro os esgotados, depois os com estoque baixo
+          if (a.status_estoque === 'esgotado' && b.status_estoque !== 'esgotado') {
+            return -1;
+          }
+          if (a.status_estoque !== 'esgotado' && b.status_estoque === 'esgotado') {
+            return 1;
+          }
+          return a.nome.localeCompare(b.nome);
+        });
         
         if (this.produtos.length === 0) {
           this.mensagem = 'Não há produtos com estoque abaixo do mínimo.';
@@ -106,6 +131,9 @@ export class EstoqueBaixoComponent implements OnInit {
         (produto.estoque_minimo && quantidadeEstoque < produto.estoque_minimo);
       
       if (estoqueBaixo) {
+        // Adicionar status ao produto
+        produto.status_estoque = quantidadeEstoque === 0 ? 'esgotado' : 'baixo';
+        
         console.log(`Produto ${produto.id} (${produto.nome}) com estoque baixo: ${quantidadeEstoque}/${produto.estoque_minimo || 'não definido'}`);
       }
       

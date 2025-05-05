@@ -3,16 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { PedidoService } from '../../../services/pedido.service';
-
-interface Pedido {
-  id: number;
-  comanda_id: number;
-  mesa: string;
-  status: string;
-  itens: any[];
-  created_at: string;
-  updated_at: string;
-}
+import { Pedido } from '../../../models/pedido.model';
 
 @Component({
   selector: 'app-pedidos-list',

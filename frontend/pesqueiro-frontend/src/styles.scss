@@ -5,3 +5,92 @@
 body {
   background-color: #f8f9fa;
 }
+
+/* ======== Estilos Globais de Responsividade ======== */
+
+/* Ajustes para tornar formulários mais amigáveis em dispositivos móveis */
+@media (max-width: 768px) {
+  /* Aumentar áreas de toque para dispositivos móveis */
+  .btn {
+    padding: 0.5rem 1rem;
+    min-height: 44px;
+  }
+  
+  /* Melhorar visibilidade dos formulários */
+  .form-control, 
+  .form-select {
+    padding: 0.75rem;
+    min-height: 44px;
+    font-size: 1rem;
+  }
+  
+  /* Espaçamento para conteúdos principais */
+  main {
+    padding: 1rem 0.75rem;
+  }
+  
+  /* Tabelas responsivas por padrão */
+  .table-responsive {
+    margin-bottom: 1rem;
+  }
+  
+  /* Evitar que textos fiquem muito grandes em telas pequenas */
+  h1 { font-size: 1.75rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.25rem; }
+  
+  /* Ajuste para cards se comportarem melhor em mobile */
+  .card {
+    margin-bottom: 1rem;
+  }
+  
+  /* Melhorar spinners e indicadores de carregamento */
+  .spinner-border {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  /* Melhorar áreas de toque para dropdowns */
+  .dropdown-item {
+    padding: 0.75rem 1rem;
+  }
+  
+  /* Melhorar distância entre elementos interativos para evitar toques acidentais */
+  .btn-group > .btn,
+  .btn + .btn,
+  .form-check {
+    margin-bottom: 0.5rem;
+  }
+
+  /* Garantir que modais são confortáveis em mobile */
+  .modal-dialog {
+    margin: 0.5rem;
+  }
+  
+  .modal-header, 
+  .modal-footer {
+    padding: 0.75rem 1rem;
+  }
+  
+  .modal-body {
+    padding: 1rem;
+  }
+}
+
+/* Ajustes específicos para telas muito pequenas */
+@media (max-width: 576px) {
+  /* Tornar tabs mais fáceis de tocar */
+  .nav-tabs .nav-link {
+    padding: 0.75rem 1rem;
+  }
+  
+  /* Paginação mais fácil de clicar em mobile */
+  .pagination .page-link {
+    padding: 0.5rem 0.75rem;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

@@ -1,0 +1,53 @@
+// Estilos específicos para o componente de caixa
+.form-check {
+  margin-right: 1rem;
+}
+
+.card-body {
+  padding: 1.25rem;
+}
+
+.card {
+  margin-bottom: 1.5rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;
+}
+
+// Melhorias para responsividade
+@media (max-width: 768px) {
+  .form-control, .form-select, .btn {
+    font-size: 1rem;
+  }
+  
+  .card-body {
+    padding: 1rem;
+  }
+}
+
+// Animação suave para o carrinho
+.alert-success, .alert-warning, .alert-danger {
+  transition: all 0.3s ease;
+}
+
+// Estilo para o carrinho vazio
+.bi-cart-x {
+  opacity: 0.5;
+}
+
+// Hover para os itens do carrinho
+.table tbody tr {
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.03);
+  }
+}
+
+// Estilo para o botão de finalizar venda
+.btn-success.btn-lg {
+  font-weight: bold;
+}
+
+// Estilo para o seletor de produtos
+.form-select-lg {
+  background-position: right 0.75rem center;
+} 

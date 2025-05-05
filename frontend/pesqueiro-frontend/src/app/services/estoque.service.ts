@@ -39,6 +39,8 @@ export class EstoqueService {
               const produto = item.produto;
               produto.quantidade_estoque = item.estoque_atual || produto.quantidade_estoque || 0;
               produto.estoque_minimo = item.estoque_minimo || produto.estoque_minimo || 0;
+              // Adicionar o status enviado pelo backend
+              produto.status_estoque = item.status || (produto.quantidade_estoque === 0 ? 'esgotado' : 'baixo');
               return produto;
             }
             return item;

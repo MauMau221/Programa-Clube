@@ -2,18 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { PainelCliente } from '../models/pedido.model';
+import { PainelCliente, Pedido } from '../models/pedido.model';
 import { map } from 'rxjs/operators';
-
-interface Pedido {
-  id: number;
-  comanda_id: number;
-  mesa: string;
-  status: string;
-  itens: any[];
-  created_at: string;
-  updated_at: string;
-}
 
 @Injectable({
   providedIn: 'root'
@@ -39,9 +29,55 @@ export class PedidoService {
     );
   }
 
+  // Listar pedidos formatados para o Kanban (com mais detalhes)
+  listarPedidos(): Observable<Pedido[]> {
+    // Usando a rota /pedido/detalhado que agora está funcionando
+    return this.http.get<Pedido[]>(`${this.apiUrl}/pedido/detalhado`).pipe(
+      map(pedidos => {
+        // Processamento adicional de dados, se necessário
+        return pedidos.map(pedido => {
+          if (!pedido.produtos) {
+            pedido.produtos = [];
+          }
+          // Garantir que a propriedade mesa seja definida para exibição
+          if (!pedido.mesa && pedido.comanda && pedido.comanda.mesa) {
+            pedido.mesa = pedido.comanda.mesa;
+          }
+          return pedido;
+        });
+      })
+    );
+  }
+
   // Obter um pedido específico
   getPedido(id: number): Observable<Pedido> {
     return this.http.get<Pedido>(`${this.apiUrl}/pedido/${id}`);
+  }
+
+  // Iniciar preparo do pedido
+  iniciarPreparo(id: number): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/pedido/${id}/iniciar-preparo`, {}).pipe(
+      map(response => {
+        // Verificar se a resposta tem a estrutura esperada
+        if (response.pedido) {
+          return response.pedido;
+        }
+        return response;
+      })
+    );
+  }
+
+  // Finalizar preparo do pedido (marcar como pronto)
+  finalizarPreparo(id: number): Observable<any> {
+    return this.http.put<any>(`${this.apiUrl}/pedido/${id}/finalizar-preparo`, {}).pipe(
+      map(response => {
+        // Verificar se a resposta tem a estrutura esperada
+        if (response.pedido) {
+          return response.pedido;
+        }
+        return response;
+      })
+    );
   }
 
   // Atualizar status do pedido (em preparo, pronto, entregue, etc.)

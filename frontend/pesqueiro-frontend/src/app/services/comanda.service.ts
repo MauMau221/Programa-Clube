@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { Comanda, ComandaItem } from '../models/comanda.model';
+import { Comanda, ComandaItem, ComandaPagamento } from '../models/comanda.model';
 import { tap, map, catchError } from 'rxjs/operators';
 import { throwError } from 'rxjs';
 
@@ -73,8 +73,12 @@ export class ComandaService {
     return this.http.put<Comanda>(`${this.apiUrl}/comanda/${id}`, comandaAtualizada);
   }
 
-  fecharComanda(id: number): Observable<Comanda> {
-    return this.http.put<Comanda>(`${this.apiUrl}/comanda/close/${id}`, {});
+  fecharComanda(id: number, dados?: { 
+    metodo_pagamento?: string, 
+    pessoas?: number, 
+    pagamentos?: ComandaPagamento[] 
+  }): Observable<Comanda> {
+    return this.http.put<Comanda>(`${this.apiUrl}/comanda/close/${id}`, dados || {});
   }
 
   cancelarComanda(id: number): Observable<Comanda> {
@@ -83,19 +87,39 @@ export class ComandaService {
 
   // Métodos para gerenciar itens da comanda
   adicionarItem(comandaId: number, item: Partial<ComandaItem>): Observable<ComandaItem> {
-    return this.http.post<ComandaItem>(`${this.apiUrl}/comanda/${comandaId}/itens`, item);
+    return this.http.post<ComandaItem>(`${this.apiUrl}/comanda/${comandaId}/item`, item);
   }
 
   atualizarItem(comandaId: number, itemId: number, item: Partial<ComandaItem>): Observable<ComandaItem> {
-    return this.http.put<ComandaItem>(`${this.apiUrl}/comanda/${comandaId}/itens/${itemId}`, item);
+    return this.http.put<ComandaItem>(`${this.apiUrl}/comanda/${comandaId}/item/${itemId}`, item);
   }
 
   removerItem(comandaId: number, itemId: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/comanda/${comandaId}/itens/${itemId}`);
+    return this.http.delete(`${this.apiUrl}/comanda/${comandaId}/item/${itemId}`);
   }
 
   // Verificar se a comanda tem pedidos pendentes de envio para a cozinha
   verificarPedidosPendentes(comandaId: number): Observable<any> {
     return this.http.get<any>(`${this.apiUrl}/comanda/${comandaId}/pedidos-pendentes`);
+  }
+
+  // Adicionar pagamento individual à comanda
+  adicionarPagamento(comandaId: number, pagamento: Partial<ComandaPagamento>): Observable<ComandaPagamento> {
+    return this.http.post<ComandaPagamento>(`${this.apiUrl}/comanda/${comandaId}/pagamento`, pagamento);
+  }
+
+  // Atualizar status de pagamento
+  atualizarStatusPagamento(comandaId: number, pagamentoId: number, status: 'pendente' | 'pago'): Observable<ComandaPagamento> {
+    return this.http.put<ComandaPagamento>(`${this.apiUrl}/comanda/${comandaId}/pagamento/${pagamentoId}`, { status });
+  }
+
+  // Remover pagamento
+  removerPagamento(comandaId: number, pagamentoId: number): Observable<any> {
+    return this.http.delete<any>(`${this.apiUrl}/comanda/${comandaId}/pagamento/${pagamentoId}`);
+  }
+
+  // Registrar venda direta (sem comanda)
+  registrarVendaDireta(dados: any): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/venda-direta`, dados);
   }
 } 

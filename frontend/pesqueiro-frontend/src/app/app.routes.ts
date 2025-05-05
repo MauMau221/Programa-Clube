@@ -15,7 +15,17 @@ import { EstoqueMovimentacaoComponent } from './components/estoque/estoque-movim
 import { EstoqueHistoricoComponent } from './components/estoque/estoque-historico.component';
 import { PedidosListComponent } from './components/pedidos/pedidos-list/pedidos-list.component';
 import { PainelClienteComponent } from './components/painel/painel-cliente.component';
+import { FuncionarioFormComponent } from './components/funcionarios/funcionario-form.component';
+import { PedidosKanbanComponent } from './components/pedidos/pedidos-kanban/pedidos-kanban.component';
+import { CaixaComponent } from './components/caixa/caixa.component';
 import { authGuard } from './guards/auth.guard';
+import { roleGuard } from './guards/role.guard';
+
+// Definição de papéis
+const ROLE_GARCOM = 'garcom';
+const ROLE_COZINHEIRO = 'cozinheiro';
+const ROLE_GERENTE = 'gerente';
+const ROLE_CAIXA = 'caixa';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
@@ -30,85 +40,119 @@ export const routes: Routes = [
     path: 'painel', 
     component: PainelClienteComponent 
   },
+  {
+    path: 'funcionarios/novo',
+    component: FuncionarioFormComponent,
+    canActivate: [authGuard],
+    canMatch: [roleGuard([ROLE_GERENTE])]
+  },
   { 
     path: 'comandas', 
     component: ComandasListComponent,
-    canActivate: [authGuard]
+    canActivate: [authGuard],
+    canMatch: [roleGuard([ROLE_GARCOM, ROLE_GERENTE, ROLE_CAIXA])]
   },
   {
     path: 'comandas/nova',
     component: ComandaFormComponent,
-    canActivate: [authGuard]
+    canActivate: [authGuard],
+    canMatch: [roleGuard([ROLE_GARCOM, ROLE_GERENTE, ROLE_CAIXA])]
   },
   {
     path: 'comandas/:id',
     component: ComandaDetailComponent,
-    canActivate: [authGuard]
+    canActivate: [authGuard],
+    canMatch: [roleGuard([ROLE_GARCOM, ROLE_GERENTE, ROLE_CAIXA])]
   },
   {
     path: 'comandas/editar/:id',
     component: ComandaFormComponent,
-    canActivate: [authGuard]
+    canActivate: [authGuard],
+    canMatch: [roleGuard([ROLE_GARCOM, ROLE_GERENTE, ROLE_CAIXA])]
   },
   {
-    path: 'produtos',
-    component: ProdutosListComponent,
-    canActivate: [authGuard]
-  },
-  {
-    path: 'produtos/novo',
-    component: ProdutoFormComponent,
-    canActivate: [authGuard]
-  },
-  {
-    path: 'produtos/editar/:id',
-    component: ProdutoFormComponent,
-    canActivate: [authGuard]
-  },
-  {
-    path: 'categorias',
-    component: CategoriasListComponent,
-    canActivate: [authGuard]
-  },
-  {
-    path: 'categorias/nova',
-    component: CategoriaFormComponent,
-    canActivate: [authGuard]
-  },
-  {
-    path: 'categorias/editar/:id',
-    component: CategoriaFormComponent,
-    canActivate: [authGuard]
-  },
-  {
-    path: 'estoque',
-    component: EstoqueListComponent,
-    canActivate: [authGuard]
-  },
-  {
-    path: 'estoque/baixo',
-    component: EstoqueBaixoComponent,
-    canActivate: [authGuard]
-  },
-  {
-    path: 'estoque/movimentacao',
-    component: EstoqueMovimentacaoComponent,
-    canActivate: [authGuard]
-  },
-  {
-    path: 'estoque/movimentacao/:id',
-    component: EstoqueMovimentacaoComponent,
-    canActivate: [authGuard]
-  },
-  {
-    path: 'estoque/historico/:id',
-    component: EstoqueHistoricoComponent,
-    canActivate: [authGuard]
+    path: 'caixa',
+    component: CaixaComponent,
+    canActivate: [authGuard],
+    canMatch: [roleGuard([ROLE_GARCOM, ROLE_GERENTE, ROLE_CAIXA])]
   },
   {
     path: 'pedidos',
     component: PedidosListComponent,
-    canActivate: [authGuard]
+    canActivate: [authGuard],
+    canMatch: [roleGuard([ROLE_COZINHEIRO, ROLE_GERENTE])]
+  },
+  {
+    path: 'cozinha',
+    component: PedidosKanbanComponent,
+    canActivate: [authGuard],
+    canMatch: [roleGuard([ROLE_COZINHEIRO, ROLE_GERENTE])]
+  },
+  {
+    path: 'produtos',
+    component: ProdutosListComponent,
+    canActivate: [authGuard],
+    canMatch: [roleGuard([ROLE_COZINHEIRO, ROLE_GERENTE])]
+  },
+  {
+    path: 'produtos/novo',
+    component: ProdutoFormComponent,
+    canActivate: [authGuard],
+    canMatch: [roleGuard([ROLE_GERENTE])]
+  },
+  {
+    path: 'produtos/editar/:id',
+    component: ProdutoFormComponent,
+    canActivate: [authGuard],
+    canMatch: [roleGuard([ROLE_GERENTE])]
+  },
+  {
+    path: 'categorias',
+    component: CategoriasListComponent,
+    canActivate: [authGuard],
+    canMatch: [roleGuard([ROLE_COZINHEIRO, ROLE_GERENTE])]
+  },
+  {
+    path: 'categorias/nova',
+    component: CategoriaFormComponent,
+    canActivate: [authGuard],
+    canMatch: [roleGuard([ROLE_GERENTE])]
+  },
+  {
+    path: 'categorias/editar/:id',
+    component: CategoriaFormComponent,
+    canActivate: [authGuard],
+    canMatch: [roleGuard([ROLE_GERENTE])]
+  },
+  {
+    path: 'estoque',
+    component: EstoqueListComponent,
+    canActivate: [authGuard],
+    canMatch: [roleGuard([ROLE_GERENTE])]
+  },
+  {
+    path: 'estoque/baixo',
+    component: EstoqueBaixoComponent,
+    canActivate: [authGuard],
+    canMatch: [roleGuard([ROLE_GERENTE])]
+  },
+  {
+    path: 'estoque/movimentacao',
+    component: EstoqueMovimentacaoComponent,
+    canActivate: [authGuard],
+    canMatch: [roleGuard([ROLE_GERENTE])]
+  },
+  {
+    path: 'estoque/movimentacao/:id',
+    component: EstoqueMovimentacaoComponent,
+    canActivate: [authGuard],
+    canMatch: [roleGuard([ROLE_GERENTE])]
+  },
+  {
+    path: 'estoque/historico/:id',
+    component: EstoqueHistoricoComponent,
+    canActivate: [authGuard],
+    canMatch: [roleGuard([ROLE_GERENTE])]
   },
   { path: '**', redirectTo: '/dashboard' }
 ]; 

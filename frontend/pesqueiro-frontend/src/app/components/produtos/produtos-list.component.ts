@@ -7,6 +7,7 @@ import { EstoqueService } from '../../services/estoque.service';
 import { Produto } from '../../models/comanda.model';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
+import { ToastService } from '../../services/toast.service';
 
 @Component({
   selector: 'app-produtos-list',
@@ -19,8 +20,11 @@ export class ProdutosListComponent implements OnInit, OnDestroy {
   produtos: Produto[] = [];
   produtosFiltrados: Produto[] = [];
   isLoading = false;
+  
+  // Mantido para compatibilidade com o template
   mensagem = '';
   tipoMensagem: 'success' | 'danger' | '' = '';
+  
   termoBusca = '';
   filtroDisponibilidade = 'todos';
   
@@ -30,7 +34,8 @@ export class ProdutosListComponent implements OnInit, OnDestroy {
   constructor(
     private produtoService: ProdutoService, 
     private estoqueService: EstoqueService,
-    private router: Router
+    private router: Router,
+    private toastService: ToastService
   ) { }
 
   ngOnInit(): void {
@@ -205,8 +210,7 @@ export class ProdutosListComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error('Erro ao carregar produtos:', error);
-        this.mensagem = 'Erro ao carregar produtos. Tente novamente mais tarde.';
-        this.tipoMensagem = 'danger';
+        this.toastService.error('Erro ao carregar produtos. Tente novamente mais tarde.');
         this.isLoading = false;
       }
     });
@@ -246,14 +250,12 @@ export class ProdutosListComponent implements OnInit, OnDestroy {
         console.log(`Disponibilidade atualizada com sucesso:`, produtoAtualizado);
         produto.status = novoStatus;
         this.isLoading = false;
-        this.mensagem = `Produto ${produto.nome} marcado como ${novoStatus === 'disponivel' ? 'disponível' : 'indisponível'}.`;
-        this.tipoMensagem = 'success';
+        this.toastService.success(`Produto ${produto.nome} marcado como ${novoStatus === 'disponivel' ? 'disponível' : 'indisponível'}.`);
       },
-      error: (err) => {
-        console.error('Erro ao alterar disponibilidade:', err);
+      error: (error) => {
+        console.error('Erro ao atualizar disponibilidade:', error);
+        this.toastService.error('Erro ao atualizar disponibilidade. Tente novamente.');
         this.isLoading = false;
-        this.mensagem = `Erro ao alterar disponibilidade do produto ${produto.nome}.`;
-        this.tipoMensagem = 'danger';
       }
     });
   }
@@ -265,28 +267,27 @@ export class ProdutosListComponent implements OnInit, OnDestroy {
   excluirProduto(evento: Event, produto: Produto): void {
     evento.stopPropagation();
     
-    if (!confirm('Tem certeza que deseja excluir este produto?')) {
-      return;
+    if (confirm(`Tem certeza que deseja excluir o produto "${produto.nome}"? Esta ação não pode ser desfeita.`)) {
+      this.isLoading = true;
+      
+      this.produtoService.excluirProduto(produto.id).subscribe({
+        next: () => {
+          this.toastService.success(`Produto "${produto.nome}" excluído com sucesso.`);
+          // Remover o produto da lista
+          this.produtos = this.produtos.filter(p => p.id !== produto.id);
+          this.aplicarFiltros();
+          this.isLoading = false;
+        },
+        error: (error) => {
+          console.error('Erro ao excluir produto:', error);
+          this.toastService.error(`Erro ao excluir produto. ${error.error?.message || 'Tente novamente.'}`);
+          this.isLoading = false;
+        }
+      });
     }
-    
-    this.isLoading = true;
-    this.produtoService.excluirProduto(produto.id).subscribe({
-      next: () => {
-        this.produtos = this.produtos.filter(p => p.id !== produto.id);
-        this.aplicarFiltros();
-        this.mensagem = 'Produto excluído com sucesso!';
-        this.tipoMensagem = 'success';
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Erro ao excluir produto:', error);
-        this.mensagem = 'Erro ao excluir produto. Tente novamente.';
-        this.tipoMensagem = 'danger';
-        this.isLoading = false;
-      }
-    });
   }
-
+  
+  // Método mantido para compatibilidade com o template
   limparMensagem(): void {
     this.mensagem = '';
     this.tipoMensagem = '';

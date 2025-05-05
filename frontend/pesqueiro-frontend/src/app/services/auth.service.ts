@@ -53,6 +53,10 @@ export class AuthService {
     return this.userSubject.value;
   }
 
+  getCurrentUser(): User | null {
+    return this.userSubject.value;
+  }
+
   getToken(): string | null {
     return localStorage.getItem('auth_token');
   }

@@ -1,8 +1,8 @@
-<div class="container mt-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Gerenciamento de Comandas</h1>
-    <a routerLink="/comandas/nova" class="btn btn-primary">
-      <i class="bi bi-plus-circle"></i> Nova Comanda
+<div class="container-fluid mt-4">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-3">
+    <h1 class="h2 mb-3 mb-md-0">Gerenciamento de Comandas</h1>
+    <a routerLink="/comandas/nova" class="btn btn-primary w-100 w-md-auto">
+      <i class="bi bi-plus-circle me-1"></i> Nova Comanda
     </a>
   </div>
 
@@ -35,7 +35,8 @@
         <p class="mt-2">Nenhuma comanda encontrada.</p>
       </div>
 
-      <div class="table-responsive" *ngIf="!isLoading && comandasFiltradas.length > 0">
+      <!-- Visualização em tabela para telas maiores -->
+      <div class="table-responsive d-none d-md-block" *ngIf="!isLoading && comandasFiltradas.length > 0">
         <table class="table table-hover">
           <thead>
             <tr>
@@ -80,6 +81,52 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Visualização em cards para dispositivos móveis -->
+      <div class="d-md-none" *ngIf="!isLoading && comandasFiltradas.length > 0">
+        <div class="card mb-3 border" *ngFor="let comanda of comandasFiltradas">
+          <div class="card-header d-flex justify-content-between align-items-center"
+               [ngClass]="{
+                 'bg-success text-white': comanda.status === 'aberta',
+                 'bg-danger text-white': comanda.status === 'cancelada',
+                 'bg-secondary text-white': comanda.status === 'fechada'
+               }">
+            <span>Mesa {{comanda.mesa}}</span>
+            <span class="badge bg-light text-dark">{{comanda.status | titlecase}}</span>
+          </div>
+          <div class="card-body">
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted">ID:</span>
+              <span>#{{comanda.id}}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted">Cliente:</span>
+              <span>{{comanda.cliente || 'N/A'}}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted">Valor Total:</span>
+              <span class="fw-bold">R$ {{(comanda.total && typeof comanda.total === 'number' ? comanda.total.toFixed(2) : '0.00')}}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="text-muted">Data:</span>
+              <span>{{comanda.created_at | date:'dd/MM/yyyy HH:mm'}}</span>
+            </div>
+          </div>
+          <div class="card-footer d-flex justify-content-between">
+            <a [routerLink]="['/comandas', comanda.id]" class="btn btn-outline-primary">
+              <i class="bi bi-eye me-1"></i> Detalhes
+            </a>
+            <div>
+              <button *ngIf="comanda.status === 'aberta'" class="btn btn-outline-success me-2" (click)="fecharComanda(comanda.id)">
+                <i class="bi bi-check-circle me-1"></i> Fechar
+              </button>
+              <button *ngIf="comanda.status === 'aberta'" class="btn btn-outline-danger" (click)="cancelarComanda(comanda.id)">
+                <i class="bi bi-x-circle me-1"></i> Cancelar
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

@@ -4,9 +4,12 @@ export interface Comanda {
   cliente?: string;
   status: 'aberta' | 'fechada' | 'cancelada';
   total: number;
+  metodo_pagamento?: string;  // Método de pagamento: dinheiro, credito, debito, pix
+  pessoas?: number;           // Número de pessoas para divisão
   created_at: string;
   updated_at: string;
   itens?: ComandaItem[];
+  pagamentos?: ComandaPagamento[]; // Lista de pagamentos individuais
 }
 
 export interface ComandaItem {
@@ -32,6 +35,7 @@ export interface Produto {
   ativo: boolean;
   categoria?: Categoria;
   status?: 'disponivel' | 'indisponivel';
+  status_estoque?: 'esgotado' | 'baixo' | 'normal';
   observacao?: string;
   estoque_minimo?: number;
   quantidade_estoque?: number;
@@ -76,4 +80,16 @@ export interface EstoqueHistorico {
   motivo?: string;
   usuario_nome: string;
   created_at: string;
+}
+
+// Interface para pagamentos individuais na comanda
+export interface ComandaPagamento {
+  id?: number;
+  comanda_id: number;
+  metodo_pagamento: string;
+  valor: number;
+  status: 'pendente' | 'pago';
+  observacao?: string;
+  created_at?: string;
+  updated_at?: string;
 } 

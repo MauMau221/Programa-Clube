@@ -1,0 +1,27 @@
+.toast-container {
+  z-index: 1100;
+  max-width: 350px;
+}
+
+.toast {
+  margin-top: 10px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  width: 100%;
+}
+
+/* Estilos para mobile */
+@media (max-width: 576px) {
+  .toast-container {
+    bottom: 10px !important;
+    right: 10px !important;
+    left: 10px !important;
+    max-width: none;
+    width: auto;
+  }
+  
+  .toast {
+    width: 100%;
+  }
+} 

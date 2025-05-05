@@ -50,15 +50,17 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let produto of produtos" [ngClass]="{'table-danger': produto.quantidade_estoque === 0}">
+                <tr *ngFor="let produto of produtos" 
+                    [ngClass]="{'table-danger': produto.status_estoque === 'esgotado', 
+                               'table-warning': produto.status_estoque === 'baixo'}">
                   <td>{{ produto.id }}</td>
                   <td>{{ produto.nome }}</td>
                   <td>{{ produto.categoria?.nome || 'Sem categoria' }}</td>
                   <td class="text-center fw-bold">{{ produto.quantidade_estoque || 0 }}</td>
                   <td class="text-center">{{ produto.estoque_minimo || 0 }}</td>
                   <td class="text-center">
-                    <span class="badge rounded-pill bg-danger" *ngIf="produto.quantidade_estoque === 0">Esgotado</span>
-                    <span class="badge rounded-pill bg-warning text-dark" *ngIf="produto.quantidade_estoque && produto.quantidade_estoque > 0 && produto.estoque_minimo && produto.quantidade_estoque < produto.estoque_minimo">Baixo</span>
+                    <span class="badge rounded-pill bg-danger" *ngIf="produto.status_estoque === 'esgotado'">Esgotado</span>
+                    <span class="badge rounded-pill bg-warning text-dark" *ngIf="produto.status_estoque === 'baixo'">Baixo</span>
                   </td>
                   <td class="text-end">
                     <a [routerLink]="['/estoque/movimentacao', produto.id]" class="btn btn-sm btn-primary me-1">

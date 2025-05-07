@@ -7,6 +7,10 @@ use App\Http\Controllers\Api\EstoqueController;
 use App\Http\Controllers\Api\PedidoController;
 use App\Http\Controllers\Api\ProdutoController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\ComandaItemController;
+use App\Http\Controllers\Api\ComandaPagamentoController;
+use App\Http\Controllers\Api\VendaController;
+use App\Http\Controllers\Api\RelatorioController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -36,18 +40,27 @@ Route::middleware('auth:sanctum')->group(function () {
     // Rotas para garçons e gerentes
     Route::middleware('role:garcom,gerente')->group(function () {
         //Comanda
-        Route::get('/comanda', [ComandaController::class, "index"]);
-        Route::get('/comanda/{id}', [ComandaController::class, "show"]);
-        Route::post('/comanda', [ComandaController::class, "store"]);
-        Route::put('/comanda/{id}', [ComandaController::class, "update"]);
-        Route::put('/comanda/close/{id}', [ComandaController::class, "close"]);
-        Route::put('/comanda/{id}/cancelar', [ComandaController::class, "cancel"]);
-        Route::get('/comanda/{id}/pedidos-pendentes', [ComandaController::class, "verificarPedidosPendentes"]);
-        
-        // Itens de Comanda
-        Route::post('/comanda/{id}/itens', [PedidoController::class, "adicionarItem"]);
-        Route::put('/comanda/{comandaId}/itens/{itemId}', [PedidoController::class, "atualizarItem"]);
-        Route::delete('/comanda/{comandaId}/itens/{itemId}', [PedidoController::class, "removerItem"]);
+        Route::prefix('comanda')->group(function () {
+            Route::get('/', [ComandaController::class, 'index']);
+            Route::post('/', [ComandaController::class, 'store']);
+            Route::get('/{id}', [ComandaController::class, 'show']);
+            Route::put('/{id}', [ComandaController::class, 'update']);
+            Route::delete('/{id}', [ComandaController::class, 'destroy']);
+            Route::put('/close/{id}', [ComandaController::class, 'close']);
+            Route::put('/cancel/{id}', [ComandaController::class, 'cancel']);
+            
+            // Rotas para itens da comanda
+            Route::post('/{id}/item', [ComandaItemController::class, 'store']);
+            Route::delete('/{comandaId}/item/{itemId}', [ComandaItemController::class, 'destroy']);
+            
+            // Verificar pedidos pendentes de envio para a cozinha
+            Route::get('/{comandaId}/pedidos-pendentes', [ComandaController::class, 'verificarPedidosPendentes']);
+            
+            // Rotas para pagamentos individuais
+            Route::post('/{id}/pagamento', [ComandaPagamentoController::class, 'store']);
+            Route::put('/{comandaId}/pagamento/{pagamentoId}', [ComandaPagamentoController::class, 'update']);
+            Route::delete('/{comandaId}/pagamento/{pagamentoId}', [ComandaPagamentoController::class, 'destroy']);
+        });
 
         //Pedido
         Route::post('/pedido/{id}', [PedidoController::class, "commandorder"]);
@@ -95,8 +108,27 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Rota para obter o saldo atual de estoque
     Route::get('/estoque/produtos/{produtoId}/saldo', [EstoqueController::class, 'getSaldo']);
+
+    // Rota para vendas diretas
+    Route::post('/venda-direta', [VendaController::class, 'vendaDireta']);
+
+    // Relatórios financeiros
+    Route::middleware('role:gerente,caixa')->group(function() {
+        Route::get('/relatorios/financeiro', [RelatorioController::class, 'financeiro']);
+        Route::get('/relatorios/financeiro/por-produto', [RelatorioController::class, 'produtosPorMetodo']);
+    });
 });
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+// Rotas para pedidos
+Route::get('/pedido', [PedidoController::class, 'index']);
+Route::get('/pedido/detalhado', [PedidoController::class, 'listarDetalhados']);
+Route::get('/pedido/contar', [PedidoController::class, 'contarPorStatus']);
+Route::get('/pedido/{id}', [PedidoController::class, 'show'])->where('id', '[0-9]+');
+Route::put('/pedido/{id}/status', [PedidoController::class, 'atualizarStatus'])->where('id', '[0-9]+');
+Route::put('/pedido/{id}/enviar-cozinha', [PedidoController::class, 'enviarParaCozinha'])->where('id', '[0-9]+');
+Route::put('/pedido/{id}/iniciar-preparo', [PedidoController::class, 'iniciarPreparo'])->where('id', '[0-9]+');
+Route::put('/pedido/{id}/finalizar-preparo', [PedidoController::class, 'finalizarPreparo'])->where('id', '[0-9]+');

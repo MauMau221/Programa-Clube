@@ -2,7 +2,7 @@ export interface Comanda {
   id: number;
   mesa: string;
   cliente?: string;
-  status: 'aberta' | 'fechada' | 'cancelada';
+  status: 'aberta' | 'fechada' | 'cancelada' | 'paga';
   total: number;
   metodo_pagamento?: string;  // Método de pagamento: dinheiro, credito, debito, pix
   pessoas?: number;           // Número de pessoas para divisão

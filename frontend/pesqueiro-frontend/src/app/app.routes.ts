@@ -20,6 +20,7 @@ import { PedidosKanbanComponent } from './components/pedidos/pedidos-kanban/pedi
 import { CaixaComponent } from './components/caixa/caixa.component';
 import { authGuard } from './guards/auth.guard';
 import { roleGuard } from './guards/role.guard';
+import { RelatoriosDashboardComponent } from './components/relatorios/relatorios-dashboard/relatorios-dashboard.component';
 
 // Definição de papéis
 const ROLE_GARCOM = 'garcom';
@@ -153,6 +154,12 @@ export const routes: Routes = [
     component: EstoqueHistoricoComponent,
     canActivate: [authGuard],
     canMatch: [roleGuard([ROLE_GERENTE])]
+  },
+  {
+    path: 'relatorios',
+    component: RelatoriosDashboardComponent,
+    canActivate: [authGuard],
+    canMatch: [roleGuard([ROLE_GERENTE, ROLE_CAIXA])]
   },
   { path: '**', redirectTo: '/dashboard' }
 ]; 

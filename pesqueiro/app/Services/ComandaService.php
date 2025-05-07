@@ -3,6 +3,8 @@
 namespace App\Services;
 
 use App\Models\Comanda;
+use App\Models\ComandaPagamento;
+use Illuminate\Support\Facades\DB;
 
 class ComandaService
 {
@@ -47,13 +49,54 @@ class ComandaService
     }
 
 
-    public function fecharComanda(int $comandaId)
+    public function fecharComanda(int $comandaId, array $dados = [])
     {
-        $comanda = Comanda::findOrFail($comandaId);
-        $comanda->status = 'paga';
-        $comanda->save();
-
-        return $comanda;
+        try {
+            // Buscar a comanda usando query builder para evitar problemas com Eloquent
+            DB::beginTransaction();
+            
+            $comanda = Comanda::findOrFail($comandaId);
+            
+            // Atualizar usando arrays em vez de propriedades do objeto
+            $dadosAtualizacao = [
+                'status' => 'fechada'
+            ];
+            
+            // Adicionar informações de pagamento, se fornecidas
+            if (isset($dados['metodo_pagamento'])) {
+                $dadosAtualizacao['metodo_pagamento'] = $dados['metodo_pagamento'];
+            }
+            
+            if (isset($dados['pessoas']) && is_numeric($dados['pessoas']) && $dados['pessoas'] > 0) {
+                $dadosAtualizacao['pessoas'] = (int) $dados['pessoas'];
+            }
+            
+            // Atualizar usando update em vez de save
+            Comanda::where('id', $comandaId)->update($dadosAtualizacao);
+            
+            // Processar pagamentos individuais, se fornecidos
+            if (isset($dados['pagamentos']) && is_array($dados['pagamentos']) && count($dados['pagamentos']) > 0) {
+                foreach ($dados['pagamentos'] as $pagamento) {
+                    // Verificar se o pagamento já tem um ID (já existe no banco)
+                    if (isset($pagamento['id']) && $pagamento['id']) {
+                        // Atualizar status para 'pago' se ainda não estiver
+                        ComandaPagamento::where('id', $pagamento['id'])
+                            ->where('comanda_id', $comandaId)
+                            ->where('status', 'pendente')
+                            ->update(['status' => 'pago']);
+                    }
+                }
+            }
+            
+            DB::commit();
+            
+            // Buscar a comanda atualizada com seus pagamentos
+            return Comanda::with('pagamentos')->findOrFail($comandaId);
+            
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
 
     public function cancelarComanda(int $comandaId)

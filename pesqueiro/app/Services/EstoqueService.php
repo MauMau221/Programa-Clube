@@ -125,6 +125,24 @@ class EstoqueService
     }
 
     /**
+     * Verifica se há estoque suficiente para determinada quantidade
+     *
+     * @param Produto $produto
+     * @param int $quantidade
+     * @return bool
+     */
+    public function verificarDisponibilidadeEstoque(Produto $produto, int $quantidade): bool
+    {
+        // Se o produto não controla estoque, sempre retorna true
+        if (!$produto->controla_estoque) {
+            return true;
+        }
+        
+        $estoqueAtual = $this->getSaldoAtual($produto);
+        return $estoqueAtual >= $quantidade;
+    }
+
+    /**
      * Verifica se o estoque está abaixo do mínimo definido
      * 
      * @param Produto $produto

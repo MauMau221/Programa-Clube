@@ -30,4 +30,12 @@ class Pedido extends Model
     {
         return $this->belongsTo(Comanda::class); //belongsTo Muitos pedidos pertence a uma comanda
     }
+    
+    /**
+     * Relação para compatibilidade com o novo formato - itens do pedido
+     */
+    public function itens()
+    {
+        return $this->hasMany(PedidoProduto::class, 'pedido_id');
+    }
 }

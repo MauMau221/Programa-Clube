@@ -15,11 +15,18 @@ class Comanda extends Model
         'mesa',
         'status',
         'observacao',
-        'cliente'
+        'cliente',
+        'metodo_pagamento',
+        'pessoas'
     ];
 
     public function pedidos()
     {
         return $this->hasMany(Pedido::class); //hasMany Uma comanda pertence a muitos pedidos
+    }
+    
+    public function pagamentos()
+    {
+        return $this->hasMany(ComandaPagamento::class);
     }
 }

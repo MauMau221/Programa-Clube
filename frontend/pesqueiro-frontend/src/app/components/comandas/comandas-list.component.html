@@ -18,6 +18,7 @@
         <select class="form-select" id="filtroStatus" [(ngModel)]="filtroStatus">
           <option value="todas">Todas</option>
           <option value="aberta">Abertas</option>
+          <option value="paga">Pagas</option>
           <option value="fechada">Fechadas</option>
           <option value="cancelada">Canceladas</option>
         </select>
@@ -58,7 +59,8 @@
                 <span class="badge" [ngClass]="{
                   'bg-success': comanda.status === 'aberta',
                   'bg-danger': comanda.status === 'cancelada',
-                  'bg-secondary': comanda.status === 'fechada'
+                  'bg-secondary': comanda.status === 'fechada',
+                  'bg-primary': comanda.status === 'paga'
                 }">
                   {{comanda.status | titlecase}}
                 </span>
@@ -90,7 +92,8 @@
                [ngClass]="{
                  'bg-success text-white': comanda.status === 'aberta',
                  'bg-danger text-white': comanda.status === 'cancelada',
-                 'bg-secondary text-white': comanda.status === 'fechada'
+                 'bg-secondary text-white': comanda.status === 'fechada',
+                 'bg-primary text-white': comanda.status === 'paga'
                }">
             <span>Mesa {{comanda.mesa}}</span>
             <span class="badge bg-light text-dark">{{comanda.status | titlecase}}</span>

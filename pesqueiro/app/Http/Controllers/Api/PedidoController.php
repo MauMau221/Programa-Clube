@@ -10,6 +10,7 @@ use App\Models\Pedido;
 use App\Models\Produto;
 use App\Models\Comanda;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class PedidoController extends Controller
 {
@@ -30,6 +31,29 @@ class PedidoController extends Controller
     }
 
     public function updateStatus(Request $request, string $pedidoId)
+    {
+        $request->validate([
+            'status' => 'required|in:pedido_iniciado,pendente,em preparo,pronto,entregue,cancelado'
+        ]);
+
+        // Encontrar o pedido
+        $pedido = Pedido::findOrFail($pedidoId);
+        
+        // Atualizar o status como string
+        $pedido->status = $request->status;
+        $pedido->save();
+        
+        return response()->json([
+            'message' => 'Status do pedido atualizado com sucesso',
+            'pedido' => $pedido->load('produtos')
+        ], 200);
+    }
+
+    /**
+     * Atualiza o status de um pedido
+     * Este método é chamado pela rota /api/pedido/{id}/status
+     */
+    public function atualizarStatus(Request $request, string $pedidoId)
     {
         $request->validate([
             'status' => 'required|in:pedido_iniciado,pendente,em preparo,pronto,entregue,cancelado'
@@ -476,5 +500,222 @@ class PedidoController extends Controller
                 'error' => $e->getMessage()
             ], 500);
         }
+    }
+
+    /**
+     * Listar pedidos com detalhes para visualização Kanban
+     */
+    public function listarDetalhados()
+    {
+        try {
+            $pedidos = Pedido::with([
+                'comanda',
+                'produtos' => function($query) {
+                    $query->select('produtos.*', 'pedido_produto.quantidade', 'pedido_produto.observacao');
+                }
+            ])
+            ->whereIn('status', ['pendente', 'em preparo', 'pronto'])
+            ->orderBy('created_at', 'desc')
+            ->get();
+            
+            // Adicionar campos necessários para o frontend e processar dados
+            $pedidos->each(function ($pedido) {
+                // Adicionar a mesa da comanda diretamente no pedido para facilitar
+                if ($pedido->comanda) {
+                    $pedido->mesa = $pedido->comanda->mesa;
+                }
+                
+                // Garantir que os timestamps para os status estejam disponíveis
+                if ($pedido->status === 'em preparo' && !$pedido->pedido_aberto) {
+                    $pedido->pedido_aberto = $pedido->updated_at;
+                }
+                
+                if ($pedido->status === 'pronto' && !$pedido->pedido_fechado) {
+                    $pedido->pedido_fechado = $pedido->updated_at;
+                }
+                
+                // Processar produtos para terem a quantidade correta
+                $pedido->produtos->each(function ($produto) {
+                    if (isset($produto->pivot)) {
+                        $produto->quantidade = $produto->pivot->quantidade;
+                        $produto->observacao = $produto->pivot->observacao;
+                    }
+                });
+            });
+            
+            return response()->json($pedidos);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Erro ao listar pedidos detalhados',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Iniciar o preparo de um pedido
+     */
+    public function iniciarPreparo($id)
+    {
+        try {
+            DB::beginTransaction();
+            
+            Log::info("Iniciando preparo do pedido ID: " . $id);
+            
+            $pedido = Pedido::with(['comanda', 'produtos'])->findOrFail($id);
+            Log::info("Pedido encontrado, status atual: " . $pedido->status);
+            
+            if ($pedido->status !== 'pendente') {
+                Log::warning("Erro: Pedido não está pendente, status atual: " . $pedido->status);
+                return response()->json([
+                    'message' => 'Este pedido não está pendente'
+                ], 422);
+            }
+            
+            // Atualizar status do pedido diretamente no banco de dados
+            $statusAnterior = $pedido->status;
+            
+            // Método 2: Atualização direta no banco de dados
+            $affected = DB::table('pedidos')
+                ->where('id', $id)
+                ->update([
+                    'status' => 'em preparo', 
+                    'pedido_aberto' => now(),
+                    'updated_at' => now()
+                ]);
+                
+            Log::info("Pedido atualizado diretamente no DB: ID {$id}, status alterado de {$statusAnterior} para 'em preparo', linhas afetadas: {$affected}");
+            
+            // Forçar commit da transação
+            DB::commit();
+            
+            // Recarregar o pedido com relacionamentos para retornar dados completos
+            // Usar findOrFail com consulta direta para evitar problemas de cache
+            $pedido = DB::table('pedidos')->where('id', $id)->first();
+            
+            if (!$pedido) {
+                throw new \Exception("Pedido não encontrado após atualização");
+            }
+            
+            // Verificar se o status foi realmente atualizado
+            if ($pedido->status === 'em preparo') {
+                Log::info("Status atualizado com sucesso para 'em preparo'");
+            } else {
+                Log::warning("FALHA: Status não foi atualizado. Status atual: " . $pedido->status);
+            }
+            
+            // Carregar o modelo completo novamente
+            $pedidoCompleto = Pedido::with(['comanda', 'produtos'])->findOrFail($id);
+            
+            // Adicionar a mesa diretamente no pedido para facilitar
+            if ($pedidoCompleto->comanda) {
+                $pedidoCompleto->mesa = $pedidoCompleto->comanda->mesa;
+            }
+            
+            Log::info("Retornando resposta de sucesso para iniciar preparo do pedido ID: " . $id);
+            return response()->json([
+                'message' => 'Pedido enviado para preparo com sucesso',
+                'pedido' => $pedidoCompleto,
+                'status' => 'em preparo'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Erro ao iniciar preparo do pedido ID {$id}: " . $e->getMessage());
+            return response()->json([
+                'message' => 'Erro ao iniciar preparo do pedido',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Finalizar o preparo de um pedido (marcar como pronto)
+     */
+    public function finalizarPreparo($id)
+    {
+        try {
+            DB::beginTransaction();
+            
+            Log::info("Finalizando preparo do pedido ID: " . $id);
+            
+            $pedido = Pedido::with(['comanda', 'produtos'])->findOrFail($id);
+            Log::info("Pedido encontrado, status atual: " . $pedido->status);
+            
+            if ($pedido->status !== 'em preparo') {
+                Log::warning("Erro: Pedido não está em preparo, status atual: " . $pedido->status);
+                return response()->json([
+                    'message' => 'Este pedido não está em preparo'
+                ], 422);
+            }
+            
+            // Atualizar status do pedido diretamente no banco de dados
+            $statusAnterior = $pedido->status;
+            
+            // Método 2: Atualização direta no banco de dados
+            $affected = DB::table('pedidos')
+                ->where('id', $id)
+                ->update([
+                    'status' => 'pronto', 
+                    'pedido_fechado' => now(),
+                    'updated_at' => now()
+                ]);
+                
+            Log::info("Pedido atualizado diretamente no DB: ID {$id}, status alterado de {$statusAnterior} para 'pronto', linhas afetadas: {$affected}");
+            
+            // Forçar commit da transação
+            DB::commit();
+            
+            // Recarregar o pedido com relacionamentos para retornar dados completos
+            // Usar findOrFail com consulta direta para evitar problemas de cache
+            $pedido = DB::table('pedidos')->where('id', $id)->first();
+            
+            if (!$pedido) {
+                throw new \Exception("Pedido não encontrado após atualização");
+            }
+            
+            // Verificar se o status foi realmente atualizado
+            if ($pedido->status === 'pronto') {
+                Log::info("Status atualizado com sucesso para 'pronto'");
+            } else {
+                Log::warning("FALHA: Status não foi atualizado. Status atual: " . $pedido->status);
+            }
+            
+            // Carregar o modelo completo novamente
+            $pedidoCompleto = Pedido::with(['comanda', 'produtos'])->findOrFail($id);
+            
+            // Adicionar a mesa diretamente no pedido para facilitar
+            if ($pedidoCompleto->comanda) {
+                $pedidoCompleto->mesa = $pedidoCompleto->comanda->mesa;
+            }
+            
+            Log::info("Retornando resposta de sucesso para finalizar preparo do pedido ID: " . $id);
+            return response()->json([
+                'message' => 'Pedido finalizado com sucesso',
+                'pedido' => $pedidoCompleto,
+                'status' => 'pronto'
+            ]);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error("Erro ao finalizar preparo do pedido ID {$id}: " . $e->getMessage());
+            return response()->json([
+                'message' => 'Erro ao finalizar preparo do pedido',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Contar pedidos por status (para diagnóstico)
+     */
+    public function contarPorStatus()
+    {
+        $contagem = [
+            'pendente' => Pedido::where('status', 'pendente')->count(),
+            'em_preparo' => Pedido::where('status', 'em preparo')->count(),
+            'pronto' => Pedido::where('status', 'pronto')->count(),
+            'total' => Pedido::whereIn('status', ['pendente', 'em preparo', 'pronto'])->count()
+        ];
+        
+        return response()->json($contagem);
     }
 }

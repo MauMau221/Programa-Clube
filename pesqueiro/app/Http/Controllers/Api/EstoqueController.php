@@ -164,10 +164,14 @@ class EstoqueController extends Controller
             
             foreach ($produtos as $produto) {
                 if ($this->estoqueService->verificarEstoqueBaixo($produto)) {
+                    // Determina o status do produto
+                    $status = ($produto->estoque_atual === 0) ? 'esgotado' : 'baixo';
+                    
                     $produtosBaixos[] = [
                         'produto' => $produto,
                         'estoque_atual' => $produto->estoque_atual,
                         'estoque_minimo' => $produto->estoque_minimo,
+                        'status' => $status,
                         'alerta' => $this->estoqueService->gerarAlertaEstoqueBaixo($produto)
                     ];
                 }

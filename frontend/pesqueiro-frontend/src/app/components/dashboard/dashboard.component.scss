@@ -9,4 +9,343 @@
     transform: translateY(-5px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   }
+}
+
+// Variáveis de cores
+$primary-color: #2196f3;
+$success-color: #4caf50;
+$info-color: #00bcd4;
+$warning-color: #ff9800;
+$light-gray: #f8f9fa;
+$dark-gray: #343a40;
+
+// Estilos para container principal
+.dashboard-container {
+  padding: 1rem 0;
+  background-color: #f8f9fa;
+}
+
+// Cartão de boas-vindas
+.welcome-card {
+  background: linear-gradient(135deg, #2b7ffe, #1565c0);
+  border-radius: 12px;
+  padding: 1.5rem;
+  color: white;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  position: relative;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -50px;
+    right: -50px;
+    width: 200px;
+    height: 200px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  
+  .welcome-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+  }
+  
+  .welcome-subtitle {
+    font-size: 1rem;
+    opacity: 0.9;
+  }
+  
+  .icon-bg {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    
+    i {
+      font-size: 1.75rem;
+    }
+  }
+}
+
+// Cartões de resumo
+.summary-card {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s, box-shadow 0.3s;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  }
+  
+  .summary-card-content {
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+  }
+  
+  .summary-card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    background: rgba(0, 0, 0, 0.1);
+    
+    i {
+      font-size: 1.5rem;
+    }
+  }
+  
+  .summary-card-info {
+    flex: 1;
+  }
+  
+  .summary-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+    line-height: 1.2;
+  }
+  
+  .summary-label {
+    font-size: 0.875rem;
+    margin-bottom: 0;
+    opacity: 0.8;
+  }
+  
+  .summary-card-footer {
+    padding: 0.75rem 1.25rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    background: rgba(0, 0, 0, 0.02);
+  }
+  
+  .view-more {
+    color: inherit;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+    
+    i {
+      font-size: 0.75rem;
+      margin-left: 0.25rem;
+      transition: transform 0.2s;
+    }
+    
+    &:hover i {
+      transform: translateX(3px);
+    }
+  }
+}
+
+// Cores para os cartões de resumo
+.bg-primary-light {
+  background-color: rgba($primary-color, 0.1);
+  color: darken($primary-color, 15%);
+  .summary-card-icon {
+    background-color: rgba($primary-color, 0.2);
+  }
+}
+
+.bg-success-light {
+  background-color: rgba($success-color, 0.1);
+  color: darken($success-color, 15%);
+  .summary-card-icon {
+    background-color: rgba($success-color, 0.2);
+  }
+}
+
+.bg-info-light {
+  background-color: rgba($info-color, 0.1);
+  color: darken($info-color, 15%);
+  .summary-card-icon {
+    background-color: rgba($info-color, 0.2);
+  }
+}
+
+.bg-warning-light {
+  background-color: rgba($warning-color, 0.1);
+  color: darken($warning-color, 15%);
+  .summary-card-icon {
+    background-color: rgba($warning-color, 0.2);
+  }
+}
+
+// Título de seção
+.section-title {
+  margin-bottom: 1.5rem;
+  
+  h2 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    color: $dark-gray;
+    
+    i {
+      margin-right: 0.5rem;
+      color: $primary-color;
+    }
+  }
+}
+
+// Cartões de recursos
+.feature-card {
+  background-color: white;
+  border-radius: 12px;
+  padding: 2rem 1.5rem;
+  height: 100%;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: $primary-color;
+    opacity: 0.8;
+  }
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  }
+  
+  .feature-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    background: $light-gray;
+    
+    i {
+      font-size: 2rem;
+      color: $primary-color;
+    }
+    
+    &.comandas {
+      background-color: rgba($primary-color, 0.1);
+      i { color: $primary-color; }
+    }
+    
+    &.pedidos {
+      background-color: rgba($info-color, 0.1);
+      i { color: $info-color; }
+    }
+    
+    &.produtos {
+      background-color: rgba($success-color, 0.1);
+      i { color: $success-color; }
+    }
+  }
+  
+  .feature-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 0.75rem;
+    color: $dark-gray;
+  }
+  
+  .feature-description {
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-bottom: 1.5rem;
+    flex: 1;
+  }
+  
+  .btn-feature {
+    align-self: center;
+    padding: 0.5rem 1.25rem;
+    font-weight: 500;
+    transition: all 0.3s;
+    border-radius: 50px;
+    
+    &:hover {
+      transform: scale(1.05);
+    }
+  }
+}
+
+// Responsividade
+@media (max-width: 992px) {
+  .welcome-card {
+    .welcome-title {
+      font-size: 1.5rem;
+    }
+  }
+  
+  .summary-card {
+    .summary-value {
+      font-size: 1.25rem;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .welcome-card {
+    .icon-bg {
+      width: 50px;
+      height: 50px;
+      
+      i {
+        font-size: 1.5rem;
+      }
+    }
+  }
+  
+  .feature-card {
+    padding: 1.5rem 1rem;
+    
+    .feature-icon {
+      width: 60px;
+      height: 60px;
+      margin-bottom: 1rem;
+      
+      i {
+        font-size: 1.5rem;
+      }
+    }
+  }
+}
+
+// Estilos para placeholders
+.placeholder-glow {
+  display: inline-block;
+  width: 100%;
+  
+  .placeholder {
+    display: inline-block;
+    min-height: 1.5rem;
+    vertical-align: middle;
+    cursor: wait;
+    background-color: currentColor;
+    opacity: 0.5;
+  }
 } 

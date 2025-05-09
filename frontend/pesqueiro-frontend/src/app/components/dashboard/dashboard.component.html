@@ -1,42 +1,65 @@
-<div class="container-fluid">
-  <div class="container mt-4">
-    <div class="row">
+<div class="dashboard-container">
+  <div class="container-fluid py-4">
+    <!-- Cabeçalho da Dashboard -->
+    <div class="row mb-4">
       <div class="col-12">
-        <div class="card shadow-sm">
-          <div class="card-body">
-            <h1 class="card-title">Bem-vindo ao Sistema de Gestão do Pesqueiro</h1>
-            <p class="card-text">Selecione uma opção no menu acima para começar.</p>
+        <div class="welcome-card">
+          <div class="d-flex align-items-center">
+            <div class="icon-bg primary me-4">
+              <i class="bi bi-shop"></i>
+            </div>
+            <div>
+              <h1 class="welcome-title">Bem-vindo ao Pesqueiro</h1>
+              <p class="welcome-subtitle mb-0">Gerencie seu estabelecimento com facilidade e eficiência</p>
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="row mt-4">
-      <div class="col-md-4 mb-4">
-        <div class="card h-100">
-          <div class="card-body">
-            <h5 class="card-title">Comandas</h5>
-            <p class="card-text">Gerencie suas comandas ativas e crie novas comandas para atender os clientes.</p>
-            <a routerLink="/comandas" class="btn btn-primary">Gerenciar Comandas</a>
+    <!-- Cartões de Resumo -->
+    <div class="row mb-4">
+      <div class="col-md-3 col-sm-6 mb-3" *ngFor="let item of summaryItems">
+        <div class="summary-card" [ngClass]="item.bgClass">
+          <div class="summary-card-content">
+            <div class="summary-card-icon">
+              <i class="bi" [ngClass]="item.icon"></i>
+            </div>
+            <div class="summary-card-info">
+              <h3 class="summary-value">
+                <span *ngIf="!isLoading">{{item.value}}</span>
+                <span *ngIf="isLoading" class="placeholder-glow">
+                  <span class="placeholder col-6"></span>
+                </span>
+              </h3>
+              <p class="summary-label">{{item.label}}</p>
+            </div>
+          </div>
+          <div class="summary-card-footer">
+            <a [routerLink]="item.route" class="view-more">Ver Detalhes <i class="bi bi-arrow-right"></i></a>
           </div>
         </div>
       </div>
-      <div class="col-md-4 mb-4">
-        <div class="card h-100">
-          <div class="card-body">
-            <h5 class="card-title">Pedidos</h5>
-            <p class="card-text">Visualize e gerencie todos os pedidos realizados no estabelecimento.</p>
-            <a routerLink="/pedidos" class="btn btn-primary">Ver Pedidos</a>
-          </div>
+    </div>
+    
+    <!-- Acesso Rápido -->
+    <div class="row mb-4">
+      <div class="col-12">
+        <div class="section-title">
+          <h2><i class="bi bi-lightning-charge"></i> Acesso Rápido</h2>
         </div>
       </div>
-      <div class="col-md-4 mb-4">
-        <div class="card h-100">
-          <div class="card-body">
-            <h5 class="card-title">Produtos</h5>
-            <p class="card-text">Cadastre e edite os produtos disponíveis para venda.</p>
-            <a routerLink="/produtos" class="btn btn-primary">Gerenciar Produtos</a>
+    </div>
+    
+    <div class="row">
+      <div class="col-md-4 mb-4" *ngFor="let card of featureCards">
+        <div class="feature-card">
+          <div class="feature-icon" [ngClass]="card.iconClass">
+            <i class="bi" [ngClass]="card.icon"></i>
           </div>
+          <h3 class="feature-title">{{card.title}}</h3>
+          <p class="feature-description">{{card.description}}</p>
+          <a [routerLink]="card.route" class="btn btn-primary btn-feature">Gerenciar {{card.title}}</a>
         </div>
       </div>
     </div>

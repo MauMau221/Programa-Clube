@@ -1,3 +1,5 @@
+@use "sass:color";
+
 .navbar {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -157,7 +159,7 @@ $dark-gray: #343a40;
 // Cores para os cartões de resumo
 .bg-primary-light {
   background-color: rgba($primary-color, 0.1);
-  color: darken($primary-color, 15%);
+  color: color.adjust($primary-color, $lightness: -15%);
   .summary-card-icon {
     background-color: rgba($primary-color, 0.2);
   }
@@ -165,7 +167,7 @@ $dark-gray: #343a40;
 
 .bg-success-light {
   background-color: rgba($success-color, 0.1);
-  color: darken($success-color, 15%);
+  color: color.adjust($success-color, $lightness: -15%);
   .summary-card-icon {
     background-color: rgba($success-color, 0.2);
   }
@@ -173,7 +175,7 @@ $dark-gray: #343a40;
 
 .bg-info-light {
   background-color: rgba($info-color, 0.1);
-  color: darken($info-color, 15%);
+  color: color.adjust($info-color, $lightness: -15%);
   .summary-card-icon {
     background-color: rgba($info-color, 0.2);
   }
@@ -181,7 +183,7 @@ $dark-gray: #343a40;
 
 .bg-warning-light {
   background-color: rgba($warning-color, 0.1);
-  color: darken($warning-color, 15%);
+  color: color.adjust($warning-color, $lightness: -15%);
   .summary-card-icon {
     background-color: rgba($warning-color, 0.2);
   }

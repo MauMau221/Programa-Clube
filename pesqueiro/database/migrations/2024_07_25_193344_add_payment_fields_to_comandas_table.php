@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('comandas', function (Blueprint $table) {
-            $table->string('status', 20)->change();
+            $table->string('metodo_pagamento')->nullable()->after('status');
+            $table->unsignedInteger('pessoas')->nullable()->after('metodo_pagamento');
         });
     }
 
@@ -22,7 +23,8 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('comandas', function (Blueprint $table) {
-            $table->string('status', 10)->change();
+            $table->dropColumn('metodo_pagamento');
+            $table->dropColumn('pessoas');
         });
     }
-};
+}; 

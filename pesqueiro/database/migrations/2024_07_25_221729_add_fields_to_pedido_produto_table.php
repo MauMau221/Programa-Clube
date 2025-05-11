@@ -37,4 +37,4 @@ return new class extends Migration
             $table->dropColumn(['valor_unitario', 'valor_total']);
         });
     }
-};
+}; 

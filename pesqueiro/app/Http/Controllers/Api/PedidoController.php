@@ -572,39 +572,18 @@ class PedidoController extends Controller
                 ], 422);
             }
             
-            // Atualizar status do pedido diretamente no banco de dados
-            $statusAnterior = $pedido->status;
+            // Atualizar status do pedido usando o próprio modelo Eloquent para evitar problemas
+            $pedido->status = 'em preparo';
+            $pedido->pedido_aberto = now();
+            $pedido->updated_at = now();
+            $pedido->save();
             
-            // Método 2: Atualização direta no banco de dados
-            $affected = DB::table('pedidos')
-                ->where('id', $id)
-                ->update([
-                    'status' => 'em preparo', 
-                    'pedido_aberto' => now(),
-                    'updated_at' => now()
-                ]);
-                
-            Log::info("Pedido atualizado diretamente no DB: ID {$id}, status alterado de {$statusAnterior} para 'em preparo', linhas afetadas: {$affected}");
+            Log::info("Pedido atualizado: ID {$id}, status alterado para 'em preparo'");
             
             // Forçar commit da transação
             DB::commit();
             
             // Recarregar o pedido com relacionamentos para retornar dados completos
-            // Usar findOrFail com consulta direta para evitar problemas de cache
-            $pedido = DB::table('pedidos')->where('id', $id)->first();
-            
-            if (!$pedido) {
-                throw new \Exception("Pedido não encontrado após atualização");
-            }
-            
-            // Verificar se o status foi realmente atualizado
-            if ($pedido->status === 'em preparo') {
-                Log::info("Status atualizado com sucesso para 'em preparo'");
-            } else {
-                Log::warning("FALHA: Status não foi atualizado. Status atual: " . $pedido->status);
-            }
-            
-            // Carregar o modelo completo novamente
             $pedidoCompleto = Pedido::with(['comanda', 'produtos'])->findOrFail($id);
             
             // Adicionar a mesa diretamente no pedido para facilitar
@@ -648,39 +627,18 @@ class PedidoController extends Controller
                 ], 422);
             }
             
-            // Atualizar status do pedido diretamente no banco de dados
-            $statusAnterior = $pedido->status;
+            // Atualizar status do pedido usando o próprio modelo Eloquent para evitar problemas
+            $pedido->status = 'pronto';
+            $pedido->pedido_fechado = now();
+            $pedido->updated_at = now();
+            $pedido->save();
             
-            // Método 2: Atualização direta no banco de dados
-            $affected = DB::table('pedidos')
-                ->where('id', $id)
-                ->update([
-                    'status' => 'pronto', 
-                    'pedido_fechado' => now(),
-                    'updated_at' => now()
-                ]);
-                
-            Log::info("Pedido atualizado diretamente no DB: ID {$id}, status alterado de {$statusAnterior} para 'pronto', linhas afetadas: {$affected}");
+            Log::info("Pedido atualizado: ID {$id}, status alterado para 'pronto'");
             
             // Forçar commit da transação
             DB::commit();
             
             // Recarregar o pedido com relacionamentos para retornar dados completos
-            // Usar findOrFail com consulta direta para evitar problemas de cache
-            $pedido = DB::table('pedidos')->where('id', $id)->first();
-            
-            if (!$pedido) {
-                throw new \Exception("Pedido não encontrado após atualização");
-            }
-            
-            // Verificar se o status foi realmente atualizado
-            if ($pedido->status === 'pronto') {
-                Log::info("Status atualizado com sucesso para 'pronto'");
-            } else {
-                Log::warning("FALHA: Status não foi atualizado. Status atual: " . $pedido->status);
-            }
-            
-            // Carregar o modelo completo novamente
             $pedidoCompleto = Pedido::with(['comanda', 'produtos'])->findOrFail($id);
             
             // Adicionar a mesa diretamente no pedido para facilitar

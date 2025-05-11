@@ -21,6 +21,9 @@ class DatabaseSeeder extends Seeder
 
         $this->call([
             AdminSeeder::class,
+            ProdutosSeeder::class,
+            EstoqueMovimentacoesSeeder::class,
+            EstoqueSaldosSeeder::class,
         ]);
     }
 }

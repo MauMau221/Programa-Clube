@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Comanda;
 use App\Models\ComandaPagamento;
+use App\Services\PedidoService;
 use Illuminate\Support\Facades\DB;
 
 class ComandaService
@@ -101,18 +102,35 @@ class ComandaService
 
     public function cancelarComanda(int $comandaId)
     {
-        $comanda = Comanda::findOrFail($comandaId);
-        
-        // Verificar se a comanda pode ser cancelada (apenas comandas abertas)
-        if ($comanda->status !== 'aberta') {
-            return response()->json([
-                'message' => 'Apenas comandas abertas podem ser canceladas'
-            ], 422);
+        DB::beginTransaction();
+        try {
+            $comanda = Comanda::findOrFail($comandaId);
+            
+            // Verificar se a comanda pode ser cancelada (apenas comandas abertas)
+            if ($comanda->status !== 'aberta') {
+                return response()->json([
+                    'message' => 'Apenas comandas abertas podem ser canceladas'
+                ], 422);
+            }
+            
+            // Obter serviço de pedidos para cancelamento dos pedidos da comanda
+            $pedidoService = app(PedidoService::class);
+            
+            // Cancelar todos os pedidos associados à comanda
+            $pedidos = $comanda->pedidos()->where('status', '!=', 'cancelado')->get();
+            foreach ($pedidos as $pedido) {
+                $pedidoService->cancelarPedido($pedido->id);
+            }
+            
+            // Mudar o status da comanda para cancelada
+            $comanda->status = 'cancelada';
+            $comanda->save();
+            
+            DB::commit();
+            return $comanda;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
         }
-        
-        $comanda->status = 'cancelada';
-        $comanda->save();
-
-        return $comanda;
     }
 }

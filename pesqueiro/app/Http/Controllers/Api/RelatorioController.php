@@ -18,17 +18,17 @@ class RelatorioController extends Controller
         $dataFim = $request->query('dataFim');
 
         $query = Comanda::query()
-            ->where('status', 'paga');
+            ->where('status', 'fechada');
 
         if ($dataInicio) {
             // Convertendo para Carbon e definindo hora inicial
             $dataInicioCarbon = Carbon::parse($dataInicio)->startOfDay();
-            $query->where('created_at', '>=', $dataInicioCarbon);
+            $query->where('updated_at', '>=', $dataInicioCarbon);
         }
         if ($dataFim) {
             // Convertendo para Carbon e definindo hora final
             $dataFimCarbon = Carbon::parse($dataFim)->endOfDay();
-            $query->where('created_at', '<=', $dataFimCarbon);
+            $query->where('updated_at', '<=', $dataFimCarbon);
         }
 
         $comandas = $query->get();
@@ -36,7 +36,7 @@ class RelatorioController extends Controller
         $totalVendido = $comandas->sum('total');
         $porMetodo = $comandas->groupBy('metodo_pagamento')->map(function ($group, $metodo) {
             return [
-                'metodo' => $metodo,
+                'metodo' => $metodo ? $metodo : 'Não especificado',
                 'valor' => $group->sum('total')
             ];
         })->values();
@@ -59,18 +59,24 @@ class RelatorioController extends Controller
         
         // Buscar comandas do método de pagamento especificado
         $query = Comanda::query()
-            ->where('status', 'paga')
-            ->where('metodo_pagamento', $metodoPagamento);
+            ->where('status', 'fechada');
+            
+        // Se o método for 'Não especificado', buscar comandas sem método definido
+        if ($metodoPagamento === 'Não especificado') {
+            $query->whereNull('metodo_pagamento');
+        } else {
+            $query->where('metodo_pagamento', $metodoPagamento);
+        }
             
         if ($dataInicio) {
             // Convertendo para Carbon e definindo hora inicial
             $dataInicioCarbon = Carbon::parse($dataInicio)->startOfDay();
-            $query->where('created_at', '>=', $dataInicioCarbon);
+            $query->where('updated_at', '>=', $dataInicioCarbon);
         }
         if ($dataFim) {
             // Convertendo para Carbon e definindo hora final
             $dataFimCarbon = Carbon::parse($dataFim)->endOfDay();
-            $query->where('created_at', '<=', $dataFimCarbon);
+            $query->where('updated_at', '<=', $dataFimCarbon);
         }
         
         // IDs das comandas encontradas

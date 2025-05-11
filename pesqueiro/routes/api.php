@@ -11,6 +11,7 @@ use App\Http\Controllers\Api\ComandaItemController;
 use App\Http\Controllers\Api\ComandaPagamentoController;
 use App\Http\Controllers\Api\VendaController;
 use App\Http\Controllers\Api\RelatorioController;
+use App\Http\Controllers\Api\DashboardController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +29,9 @@ Route::get('/pedidos/painel-cliente', [PedidoController::class, "painelCliente"]
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/me', [AuthController::class, 'me']);
+
+    // Rota do dashboard
+    Route::get('/dashboard/summary', [DashboardController::class, 'summary']);
 
     // Rotas de usuário
     Route::prefix('user')->group(function () {

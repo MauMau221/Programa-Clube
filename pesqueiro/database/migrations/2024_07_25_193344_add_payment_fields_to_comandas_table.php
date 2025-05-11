@@ -12,8 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('comandas', function (Blueprint $table) {
-            $table->string('metodo_pagamento')->nullable()->after('status');
-            $table->unsignedInteger('pessoas')->nullable()->after('metodo_pagamento');
+            if (!Schema::hasColumn('comandas', 'metodo_pagamento')) {
+                $table->string('metodo_pagamento')->nullable()->after('status');
+            }
+            
+            if (!Schema::hasColumn('comandas', 'pessoas')) {
+                $table->unsignedInteger('pessoas')->nullable()->after('metodo_pagamento');
+            }
         });
     }
 
@@ -23,8 +28,13 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('comandas', function (Blueprint $table) {
-            $table->dropColumn('metodo_pagamento');
-            $table->dropColumn('pessoas');
+            if (Schema::hasColumn('comandas', 'metodo_pagamento')) {
+                $table->dropColumn('metodo_pagamento');
+            }
+            
+            if (Schema::hasColumn('comandas', 'pessoas')) {
+                $table->dropColumn('pessoas');
+            }
         });
     }
 }; 

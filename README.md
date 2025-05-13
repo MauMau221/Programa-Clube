@@ -5,8 +5,8 @@ Sistema de gerenciamento para restaurante especializado em pescados, com control
 ## Estrutura do Projeto
 
 Este repositório contém duas partes principais:
-- `/pesqueiro/` - Backend desenvolvido em Laravel
-- `/frontend/pesqueiro-frontend/` - Frontend desenvolvido em Angular
+- `/backend/` - Backend desenvolvido em Laravel
+- `/frontend/` - Frontend desenvolvido em Angular
 
 ## Requisitos do Sistema
 

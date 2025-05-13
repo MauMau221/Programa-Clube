@@ -222,4 +222,20 @@ export class DashboardComponent implements OnInit {
     this.summaryItems[2].value = data.pedidosHoje;
     this.summaryItems[3].value = data.produtosBaixoEstoque;
   }
+
+  /**
+   * Gera parâmetros de consulta com a data atual para relatórios
+   */
+  private getHojeQueryParams(): any {
+    const hoje = new Date();
+    const ano = hoje.getFullYear();
+    const mes = String(hoje.getMonth() + 1).padStart(2, '0');
+    const dia = String(hoje.getDate()).padStart(2, '0');
+    const dataFormatada = `${ano}-${mes}-${dia}`;
+    
+    return {
+      dataInicio: dataFormatada,
+      dataFim: dataFormatada
+    };
+  }
 } 

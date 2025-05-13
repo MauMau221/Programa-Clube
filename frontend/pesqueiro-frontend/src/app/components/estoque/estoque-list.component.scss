@@ -36,4 +36,73 @@
 
 .badge {
   padding: 0.5rem 0.75rem;
+}
+
+// Mobile view enhancements
+@media (max-width: 992px) {
+  h1.h2 {
+    font-size: 1.5rem;
+  }
+  
+  .card {
+    margin-bottom: 0.75rem;
+    
+    &.border-warning {
+      border-left-width: 4px;
+    }
+    
+    &.border-danger {
+      border-left-width: 4px;
+    }
+  }
+  
+  .badge {
+    font-size: 0.75rem;
+    padding: 0.4rem 0.6rem;
+  }
+}
+
+// Fix spacing for smaller devices
+@media (max-width: 576px) {
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+  
+  .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.7rem;
+    white-space: nowrap;
+  }
+  
+  // Ajustar largura dos botões em cards
+  .card .d-flex.justify-content-between {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    
+    small {
+      width: 100%;
+      margin-bottom: 0.25rem;
+    }
+    
+    div {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      
+      .btn {
+        flex: 1;
+        margin-left: 0.25rem;
+        margin-right: 0.25rem;
+        
+        &:first-child {
+          margin-left: 0;
+        }
+        
+        &:last-child {
+          margin-right: 0;
+        }
+      }
+    }
+  }
 } 

@@ -1,11 +1,11 @@
 <div class="container mt-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Produtos com Estoque Baixo</h1>
-    <div>
-      <a routerLink="/estoque/movimentacao" class="btn btn-primary me-2">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+    <h1 class="h2">Produtos com Estoque Baixo</h1>
+    <div class="d-grid d-md-flex gap-2">
+      <a routerLink="/estoque/movimentacao" class="btn btn-primary w-100 w-md-auto">
         <i class="bi bi-box-arrow-in-down"></i> Nova Movimentação
       </a>
-      <a routerLink="/estoque" class="btn btn-outline-secondary">
+      <a routerLink="/estoque" class="btn btn-outline-secondary w-100 w-md-auto">
         <i class="bi bi-arrow-left"></i> Voltar
       </a>
     </div>
@@ -28,6 +28,7 @@
     <p class="mt-2">Todos os produtos estão com estoque adequado!</p>
   </div>
 
+  <!-- Versão para telas maiores - tabela -->
   <div class="row" *ngIf="!isLoading && produtos.length > 0">
     <div class="col-md-12">
       <div class="card shadow-sm">
@@ -36,7 +37,7 @@
           Produtos que precisam de reposição
         </div>
         <div class="card-body p-0">
-          <div class="table-responsive">
+          <div class="table-responsive d-none d-lg-block">
             <table class="table table-hover mb-0">
               <thead>
                 <tr>
@@ -73,6 +74,54 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+          
+          <!-- Versão para telas mobile - cards -->
+          <div class="d-lg-none">
+            <div class="p-3">
+              <div class="row g-3">
+                <div class="col-12" *ngFor="let produto of produtos">
+                  <div class="card h-100" [ngClass]="{'border-danger': produto.status_estoque === 'esgotado', 'border-warning': produto.status_estoque === 'baixo'}">
+                    <div class="card-body">
+                      <div class="d-flex justify-content-between align-items-start mb-2">
+                        <h5 class="card-title mb-0">{{ produto.nome }}</h5>
+                        <span class="badge rounded-pill" [ngClass]="{'bg-danger': produto.status_estoque === 'esgotado', 'bg-warning text-dark': produto.status_estoque === 'baixo'}">
+                          {{ produto.status_estoque === 'esgotado' ? 'Esgotado' : 'Baixo' }}
+                        </span>
+                      </div>
+                      <p class="card-text text-muted small">{{ produto.categoria?.nome || 'Sem categoria' }}</p>
+                      
+                      <div class="row g-2 mt-3">
+                        <div class="col-6">
+                          <div class="d-flex flex-column">
+                            <small class="text-muted">Estoque atual:</small>
+                            <strong class="fw-bold">{{ produto.quantidade_estoque || 0 }}</strong>
+                          </div>
+                        </div>
+                        <div class="col-6">
+                          <div class="d-flex flex-column">
+                            <small class="text-muted">Estoque mínimo:</small>
+                            <strong>{{ produto.estoque_minimo || 0 }}</strong>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div class="d-flex justify-content-between mt-4">
+                        <small class="text-muted">ID: {{ produto.id }}</small>
+                        <div>
+                          <a [routerLink]="['/estoque/movimentacao', produto.id]" class="btn btn-sm btn-primary me-1">
+                            <i class="bi bi-plus-circle"></i> Repor
+                          </a>
+                          <a [routerLink]="['/estoque/historico', produto.id]" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-clock-history"></i> Histórico
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>

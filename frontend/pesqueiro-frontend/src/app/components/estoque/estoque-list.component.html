@@ -1,11 +1,11 @@
 <div class="container mt-4">
-  <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>Gerenciamento de Estoque</h1>
-    <div>
-      <a routerLink="/estoque/movimentacao" class="btn btn-primary me-2">
+  <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4 gap-3">
+    <h1 class="h2">Gerenciamento de Estoque</h1>
+    <div class="d-grid d-md-flex gap-2">
+      <a routerLink="/estoque/movimentacao" class="btn btn-primary w-100 w-md-auto">
         <i class="bi bi-box-arrow-in-down"></i> Nova Movimentação
       </a>
-      <a routerLink="/estoque/baixo" class="btn btn-warning">
+      <a routerLink="/estoque/baixo" class="btn btn-warning w-100 w-md-auto">
         <i class="bi bi-exclamation-triangle"></i> Verificar Estoque Baixo
       </a>
     </div>
@@ -18,8 +18,8 @@
 
   <div class="card shadow-sm mb-4">
     <div class="card-body">
-      <div class="row">
-        <div class="col-md-5 mb-3">
+      <div class="row g-3">
+        <div class="col-12 col-md-5">
           <div class="input-group">
             <span class="input-group-text">
               <i class="bi bi-search"></i>
@@ -27,25 +27,25 @@
             <input 
               type="text" 
               class="form-control" 
-              placeholder="Buscar produtos por nome ou observação..." 
+              placeholder="Buscar produtos..." 
               [(ngModel)]="termoBusca"
               (ngModelChange)="aplicarFiltros()"
             >
           </div>
         </div>
-        <div class="col-md-3 mb-3">
+        <div class="col-6 col-md-3">
           <select class="form-select" [(ngModel)]="filtroDisponibilidade" (ngModelChange)="aplicarFiltros()">
             <option value="todos">Todos os produtos</option>
             <option value="disponiveis">Somente disponíveis</option>
             <option value="indisponiveis">Somente indisponíveis</option>
           </select>
         </div>
-        <div class="col-md-4 mb-3">
+        <div class="col-6 col-md-4">
           <select class="form-select" [(ngModel)]="filtroEstoque" (ngModelChange)="aplicarFiltros()">
-            <option value="todos">Todos os níveis de estoque</option>
+            <option value="todos">Todos os níveis</option>
             <option value="baixo">Estoque baixo</option>
             <option value="esgotado">Esgotado</option>
-            <option value="adequado">Estoque adequado</option>
+            <option value="adequado">Adequado</option>
           </select>
         </div>
       </div>
@@ -65,7 +65,8 @@
     <p class="mt-2" *ngIf="!termoBusca && filtroDisponibilidade === 'todos' && filtroEstoque === 'todos'">Nenhum produto cadastrado.</p>
   </div>
 
-  <div class="card shadow-sm" *ngIf="!isLoading && produtosFiltrados.length > 0">
+  <!-- Versão para telas maiores - tabela normal -->
+  <div class="card shadow-sm d-none d-lg-block" *ngIf="!isLoading && produtosFiltrados.length > 0">
     <div class="card-body p-0">
       <div class="table-responsive">
         <table class="table table-hover mb-0">
@@ -122,6 +123,78 @@
             </tr>
           </tbody>
         </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Versão para telas mobile - cards -->
+  <div class="d-lg-none" *ngIf="!isLoading && produtosFiltrados.length > 0">
+    <div class="row g-3">
+      <div class="col-12" *ngFor="let produto of produtosFiltrados">
+        <div class="card shadow-sm h-100" [ngClass]="{'border-warning': getStatusEstoque(produto) === 'Estoque Baixo', 'border-danger': getStatusEstoque(produto) === 'Esgotado'}">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <h5 class="card-title mb-0">{{ produto.nome || 'Sem nome' }}</h5>
+              <span class="badge" [ngClass]="getClasseEstoque(produto)">
+                {{ getStatusEstoque(produto) }}
+              </span>
+            </div>
+            <p class="card-text text-muted small">{{ produto.categoria?.nome || 'Sem categoria' }}</p>
+            
+            <div class="row g-2 mt-3">
+              <div class="col-6">
+                <div class="d-flex flex-column">
+                  <small class="text-muted">Preço:</small>
+                  <strong>
+                    <ng-container *ngIf="produto.preco !== undefined && produto.preco !== null">
+                      R$ {{ produto.preco.toFixed(2) }}
+                    </ng-container>
+                    <ng-container *ngIf="produto.preco === undefined || produto.preco === null">
+                      Não definido
+                    </ng-container>
+                  </strong>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="d-flex flex-column">
+                  <small class="text-muted">Disponível:</small>
+                  <strong>
+                    <i class="bi" [ngClass]="produto.status === 'disponivel' ? 'bi-check-circle-fill text-success' : (produto.status === 'indisponivel' ? 'bi-x-circle-fill text-danger' : 'bi-question-circle text-secondary')"></i>
+                    {{ produto.status === 'disponivel' ? 'Sim' : 'Não' }}
+                  </strong>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="d-flex flex-column">
+                  <small class="text-muted">Estoque:</small>
+                  <strong [ngClass]="getClasseEstoque(produto)">
+                    {{ produto.quantidade_estoque !== undefined && produto.quantidade_estoque !== null ? produto.quantidade_estoque : 'N/D' }}
+                  </strong>
+                </div>
+              </div>
+              <div class="col-6">
+                <div class="d-flex flex-column">
+                  <small class="text-muted">Mínimo:</small>
+                  <strong>
+                    {{ produto.estoque_minimo !== undefined && produto.estoque_minimo !== null ? produto.estoque_minimo : 'N/D' }}
+                  </strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+              <small class="text-muted">ID: {{ produto.id || 'N/A' }}</small>
+              <div>
+                <a [routerLink]="['/estoque/movimentacao']" [queryParams]="{produto_id: produto.id}" class="btn btn-sm btn-primary me-1">
+                  <i class="bi bi-arrow-down-up"></i> Movimentar
+                </a>
+                <a [routerLink]="['/produtos/editar', produto.id]" class="btn btn-sm btn-secondary">
+                  <i class="bi bi-pencil"></i> Editar
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>

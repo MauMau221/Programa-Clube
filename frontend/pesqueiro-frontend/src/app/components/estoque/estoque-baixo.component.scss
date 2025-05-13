@@ -1,9 +1,17 @@
 .card {
   border-radius: 0.5rem;
-  transition: box-shadow 0.3s;
-
+  transition: all 0.3s;
+  
   &:hover {
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  }
+  
+  &.border-danger {
+    border-left-width: 3px;
+  }
+  
+  &.border-warning {
+    border-left-width: 3px;
   }
 }
 
@@ -18,16 +26,72 @@
 }
 
 .badge {
-  padding: 0.5rem 0.75rem;
+  padding: 0.4rem 0.7rem;
 }
 
-.btn-group {
-  .btn {
-    padding: 0.25rem 0.5rem;
-    margin-right: 0.25rem;
+.btn-sm {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  border-radius: 0.25rem;
+}
+
+// Mobile enhancements
+@media (max-width: 992px) {
+  h1.h2 {
+    font-size: 1.5rem;
+  }
+  
+  .card {
+    margin-bottom: 0.75rem;
+  }
+  
+  .badge {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.6rem;
+  }
+}
+
+// Fix spacing for smaller devices
+@media (max-width: 576px) {
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+  
+  .btn-sm {
+    padding: 0.2rem 0.45rem;
+    font-size: 0.7rem;
+    white-space: nowrap;
+  }
+  
+  // Ajustar largura dos botões em cards
+  .card .d-flex.justify-content-between {
+    flex-wrap: wrap;
+    gap: 0.5rem;
     
-    &:last-child {
-      margin-right: 0;
+    small {
+      width: 100%;
+      margin-bottom: 0.25rem;
+    }
+    
+    div {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      
+      .btn {
+        flex: 1;
+        margin-left: 0.25rem;
+        margin-right: 0.25rem;
+        
+        &:first-child {
+          margin-left: 0;
+        }
+        
+        &:last-child {
+          margin-right: 0;
+        }
+      }
     }
   }
 } 

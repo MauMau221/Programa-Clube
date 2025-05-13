@@ -27,7 +27,7 @@ Este repositório contém duas partes principais:
 
 ```bash
 git clone https://github.com/seu-usuario/pesqueiroAPI.git
-cd pesqueiroAPI
+cd Programa-Clube
 ```
 
 ### 2. Configuração do Backend (Laravel)

@@ -60,7 +60,7 @@ class ComandaService
             
             // Atualizar usando arrays em vez de propriedades do objeto
             $dadosAtualizacao = [
-                'status' => 'fechada'
+                'status' => isset($dados['status']) ? $dados['status'] : 'fechada'
             ];
             
             // Adicionar informações de pagamento, se fornecidas

@@ -36,7 +36,7 @@ class DashboardController extends Controller
             $comandasAtivas = Comanda::where('status', 'aberta')->count();
             
             // 2. Faturamento Hoje - soma dos totais das comandas fechadas hoje
-            $faturamentoHoje = Comanda::where('status', 'fechada')
+            $faturamentoHoje = Comanda::whereIn('status', ['fechada', 'paga'])
                 ->whereDate('updated_at', $hoje)
                 ->sum('total');
                 

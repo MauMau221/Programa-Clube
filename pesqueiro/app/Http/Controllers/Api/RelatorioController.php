@@ -18,7 +18,7 @@ class RelatorioController extends Controller
         $dataFim = $request->query('dataFim');
 
         $query = Comanda::query()
-            ->where('status', 'fechada');
+            ->whereIn('status', ['fechada', 'paga']);
 
         if ($dataInicio) {
             // Convertendo para Carbon e definindo hora inicial
@@ -59,7 +59,7 @@ class RelatorioController extends Controller
         
         // Buscar comandas do método de pagamento especificado
         $query = Comanda::query()
-            ->where('status', 'fechada');
+            ->whereIn('status', ['fechada', 'paga']);
             
         // Se o método for 'Não especificado', buscar comandas sem método definido
         if ($metodoPagamento === 'Não especificado') {

@@ -35,7 +35,7 @@ cd Programa-Clube
 #### 2.1. Instalação das Dependências
 
 ```bash
-cd pesqueiro
+cd backend
 composer install
 ```
 

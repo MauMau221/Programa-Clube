@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 import { RelatorioService, ResumoFinanceiro, ProdutoPorMetodo } from '../../../services/relatorio.service';
 
 @Component({
@@ -21,7 +22,11 @@ export class RelatoriosDashboardComponent implements OnInit {
   produtosPorMetodo: ProdutoPorMetodo[] = [];
   loadingProdutos = false;
 
-  constructor(private fb: FormBuilder, private relatorioService: RelatorioService) {
+  constructor(
+    private fb: FormBuilder, 
+    private relatorioService: RelatorioService,
+    private route: ActivatedRoute
+  ) {
     this.filtroForm = this.fb.group({
       dataInicio: [''],
       dataFim: ['']
@@ -29,14 +34,23 @@ export class RelatoriosDashboardComponent implements OnInit {
   }
 
   ngOnInit() {
+    // Valor padrão: data de hoje
     const hoje = this.formatarDataParaInput(new Date());
     
-    this.filtroForm.patchValue({
-      dataInicio: hoje,
-      dataFim: hoje
+    // Obter parâmetros da URL
+    this.route.queryParams.subscribe(params => {
+      const dataInicio = params['dataInicio'] || hoje;
+      const dataFim = params['dataFim'] || hoje;
+      
+      // Preencher o formulário com os valores da URL ou os valores padrão
+      this.filtroForm.patchValue({
+        dataInicio: dataInicio,
+        dataFim: dataFim
+      });
+      
+      // Buscar relatório automaticamente
+      this.buscarRelatorio();
     });
-    
-    this.buscarRelatorio();
   }
   
   formatarDataParaInput(data: Date): string {

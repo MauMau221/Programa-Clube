@@ -17,6 +17,19 @@
       </div>
     </div>
 
+    <!-- Mensagem de erro -->
+    <div *ngIf="hasError" class="row mb-4">
+      <div class="col-12">
+        <div class="alert alert-danger">
+          <i class="bi bi-exclamation-triangle-fill me-2"></i>
+          {{ errorMessage }}
+          <button class="btn btn-sm btn-outline-danger ms-2" (click)="loadDashboardData()">
+            <i class="bi bi-arrow-clockwise me-1"></i> Tentar novamente
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- Cartões de Resumo -->
     <div class="row mb-4">
       <div class="col-md-3 col-sm-6 mb-3" *ngFor="let item of summaryItems">
@@ -36,7 +49,7 @@
             </div>
           </div>
           <div class="summary-card-footer">
-            <a [routerLink]="item.route" class="view-more">Ver Detalhes <i class="bi bi-arrow-right"></i></a>
+            <a [routerLink]="item.route" [queryParams]="item.queryParams" class="view-more">Ver Detalhes <i class="bi bi-arrow-right"></i></a>
           </div>
         </div>
       </div>
@@ -52,8 +65,8 @@
     </div>
     
     <div class="row">
-      <div class="col-md-4 mb-4" *ngFor="let card of featureCards">
-        <div class="feature-card">
+      <div class="col-xl-3 col-lg-4 col-md-6 mb-4" *ngFor="let card of featureCards">
+        <div class="feature-card" *ngIf="shouldShowCard(card)">
           <div class="feature-icon" [ngClass]="card.iconClass">
             <i class="bi" [ngClass]="card.icon"></i>
           </div>

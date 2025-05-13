@@ -82,7 +82,7 @@ export class ComandaService {
   }
 
   cancelarComanda(id: number): Observable<Comanda> {
-    return this.http.put<Comanda>(`${this.apiUrl}/comanda/${id}/cancelar`, {});
+    return this.http.put<Comanda>(`${this.apiUrl}/comanda/cancel/${id}`, {});
   }
 
   // Métodos para gerenciar itens da comanda

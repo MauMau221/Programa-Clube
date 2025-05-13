@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
 export interface DashboardSummary {
@@ -26,8 +26,7 @@ export class DashboardService {
     return this.http.get<DashboardSummary>(`${this.apiUrl}/summary`).pipe(
       catchError(error => {
         console.error('Erro ao buscar resumo do dashboard', error);
-        // Retornar dados mockados em caso de erro
-        return of(this.getMockSummary());
+        throw error;
       })
     );
   }
@@ -42,17 +41,5 @@ export class DashboardService {
       style: 'currency', 
       currency: 'BRL' 
     }).format(value);
-  }
-
-  /**
-   * Retorna dados mockados para desenvolvimento e em caso de falhas na API
-   */
-  private getMockSummary(): DashboardSummary {
-    return {
-      comandasAtivas: 12,
-      faturamentoHoje: 2560.0,
-      pedidosHoje: 36,
-      produtosBaixoEstoque: 8
-    };
   }
 } 

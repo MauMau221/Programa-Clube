@@ -1,11 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-<<<<<<< Updated upstream
-import { ActivatedRoute } from '@angular/router';
-=======
 import { ActivatedRoute, RouterModule } from '@angular/router';
->>>>>>> Stashed changes
 import { RelatorioService, ResumoFinanceiro, ProdutoPorMetodo } from '../../../services/relatorio.service';
 
 @Component({
@@ -38,33 +34,17 @@ export class RelatoriosDashboardComponent implements OnInit {
   }
 
   ngOnInit() {
-<<<<<<< Updated upstream
-    // Valor padrão: data de hoje
-    const hoje = this.formatarDataParaInput(new Date());
-    
-    // Obter parâmetros da URL
-    this.route.queryParams.subscribe(params => {
-      const dataInicio = params['dataInicio'] || hoje;
-      const dataFim = params['dataFim'] || hoje;
-      
-      // Preencher o formulário com os valores da URL ou os valores padrão
-=======
     // Verificar se há parâmetros na URL
     this.route.queryParams.subscribe(params => {
       // Usar os parâmetros da URL ou usar a data de hoje como padrão
       const dataInicio = params['dataInicio'] || this.formatarDataParaInput(new Date());
       const dataFim = params['dataFim'] || this.formatarDataParaInput(new Date());
       
->>>>>>> Stashed changes
       this.filtroForm.patchValue({
         dataInicio: dataInicio,
         dataFim: dataFim
       });
       
-<<<<<<< Updated upstream
-      // Buscar relatório automaticamente
-=======
->>>>>>> Stashed changes
       this.buscarRelatorio();
     });
   }

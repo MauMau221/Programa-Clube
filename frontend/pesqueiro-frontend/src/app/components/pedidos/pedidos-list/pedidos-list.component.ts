@@ -4,6 +4,7 @@ import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { PedidoService } from '../../../services/pedido.service';
 import { Pedido } from '../../../models/pedido.model';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'app-pedidos-list',
@@ -20,9 +21,19 @@ export class PedidosListComponent implements OnInit {
   tipoMensagem: 'success' | 'danger' | 'info' | '' = '';
   filtroStatus = 'pendente'; // Opções: 'todos', 'pendente', 'em preparo', 'pronto', 'entregue', 'cancelado'
 
-  constructor(private pedidoService: PedidoService) { }
+  constructor(
+    private pedidoService: PedidoService,
+    private route: ActivatedRoute
+  ) { }
 
   ngOnInit(): void {
+    // Verificar parâmetros da URL
+    this.route.queryParams.subscribe(params => {
+      if (params['filtro']) {
+        this.filtroStatus = params['filtro'];
+      }
+    });
+    
     this.carregarPedidos();
     // Configurar atualização automática a cada 30 segundos
     setInterval(() => this.carregarPedidos(), 30000);

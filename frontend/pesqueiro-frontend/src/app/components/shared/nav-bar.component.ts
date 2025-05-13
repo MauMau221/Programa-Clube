@@ -14,85 +14,88 @@ declare var bootstrap: any;
   template: `
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
       <div class="container">
-        <a class="navbar-brand" routerLink="/dashboard">Pesqueiro</a>
+        <a class="navbar-brand me-2" routerLink="/dashboard">Pesqueiro</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav me-auto" *ngIf="isLoggedIn">
+          <ul class="navbar-nav me-auto align-items-center nav-container" *ngIf="isLoggedIn">
             <li class="nav-item">
-              <a class="nav-link d-flex align-items-center py-3 py-lg-2" routerLink="/dashboard" routerLinkActive="active" 
+              <a class="nav-link" routerLink="/dashboard" routerLinkActive="active" 
                  (click)="closeMenuOnMobile()">
-                <i class="bi bi-house-door me-2 d-inline d-lg-none"></i> Dashboard
+                <i class="bi bi-house-door me-2"></i> Dashboard
               </a>
             </li>
             <!-- Link para o Caixa Direto -->
             <li class="nav-item" *ngIf="isGarcom || isGerente || isCaixa">
-              <a class="nav-link d-flex align-items-center py-3 py-lg-2" routerLink="/caixa" routerLinkActive="active"
+              <a class="nav-link" routerLink="/caixa" routerLinkActive="active"
                  (click)="closeMenuOnMobile()">
                 <i class="bi bi-cash-register me-2"></i> Caixa Direto
               </a>
             </li>
             <!-- Links para Garçom e Gerente -->
             <li class="nav-item" *ngIf="isGarcom || isGerente || isCaixa">
-              <a class="nav-link d-flex align-items-center py-3 py-lg-2" routerLink="/comandas" routerLinkActive="active"
+              <a class="nav-link" routerLink="/comandas" routerLinkActive="active"
                  (click)="closeMenuOnMobile()">
-                <i class="bi bi-receipt me-2 d-inline d-lg-none"></i> Comandas
+                <i class="bi bi-receipt me-2"></i> Comandas
               </a>
             </li>
             <!-- Links para Cozinheiro e Gerente -->
             <li class="nav-item" *ngIf="isCozinheiro || isGerente">
-              <a class="nav-link d-flex align-items-center py-3 py-lg-2" routerLink="/pedidos" routerLinkActive="active"
+              <a class="nav-link" routerLink="/pedidos" routerLinkActive="active"
                  (click)="closeMenuOnMobile()">
-                <i class="bi bi-list-check me-2 d-inline d-lg-none"></i> Pedidos
+                <i class="bi bi-list-check me-2"></i> Pedidos
               </a>
             </li>
             <li class="nav-item" *ngIf="isCozinheiro || isGerente">
-              <a class="nav-link d-flex align-items-center py-3 py-lg-2" routerLink="/cozinha" routerLinkActive="active"
+              <a class="nav-link" routerLink="/cozinha" routerLinkActive="active"
                  (click)="closeMenuOnMobile()">
                 <i class="bi bi-kanban me-2"></i> Central da Cozinha
               </a>
             </li>
             <li class="nav-item" *ngIf="isCozinheiro || isGerente">
-              <a class="nav-link d-flex align-items-center py-3 py-lg-2" routerLink="/produtos" routerLinkActive="active"
+              <a class="nav-link" routerLink="/produtos" routerLinkActive="active"
                  (click)="closeMenuOnMobile()">
-                <i class="bi bi-box me-2 d-inline d-lg-none"></i> Produtos
+                <i class="bi bi-box me-2"></i> Produtos
               </a>
             </li>
-            <li class="nav-item" *ngIf="isCozinheiro || isGerente">
-              <a class="nav-link d-flex align-items-center py-3 py-lg-2" routerLink="/categorias" routerLinkActive="active"
+            <!-- Categorias apenas em mobile -->
+            <li class="nav-item d-lg-none" *ngIf="isCozinheiro || isGerente">
+              <a class="nav-link" routerLink="/categorias" routerLinkActive="active"
                  (click)="closeMenuOnMobile()">
-                <i class="bi bi-tags me-2 d-inline d-lg-none"></i> Categorias
+                <i class="bi bi-tags me-2"></i> Categorias
               </a>
             </li>
             <!-- Links apenas para Gerente -->
             <li class="nav-item" *ngIf="isGerente">
-              <a class="nav-link d-flex align-items-center py-3 py-lg-2" routerLink="/estoque" routerLinkActive="active"
+              <a class="nav-link" routerLink="/estoque" routerLinkActive="active"
                  (click)="closeMenuOnMobile()">
-                <i class="bi bi-box-seam me-2 d-inline d-lg-none"></i> Estoque
+                <i class="bi bi-box-seam me-2"></i> Estoque
               </a>
             </li>
-            <li class="nav-item" *ngIf="isGerente">
-              <a class="nav-link d-flex align-items-center py-3 py-lg-2" routerLink="/funcionarios/novo" routerLinkActive="active"
+            <!-- Cadastrar Funcionário apenas em mobile -->
+            <li class="nav-item d-lg-none" *ngIf="isGerente">
+              <a class="nav-link" routerLink="/funcionarios/novo" routerLinkActive="active"
                  (click)="closeMenuOnMobile()">
-                <i class="bi bi-person-plus me-2 d-inline d-lg-none"></i> Cadastrar Funcionário
+                <i class="bi bi-person-plus me-2"></i> Cadastrar Funcionário
               </a>
             </li>
-            <li class="nav-item" *ngIf="isGerente">
-              <a class="nav-link d-flex align-items-center py-3 py-lg-2" routerLink="/relatorios" routerLinkActive="active"
+            <!-- Relatórios apenas em mobile -->
+            <li class="nav-item d-lg-none" *ngIf="isGerente">
+              <a class="nav-link" routerLink="/relatorios" routerLinkActive="active"
                  (click)="closeMenuOnMobile()">
-                <i class="bi bi-graph-up me-2 d-inline d-lg-none"></i> Relatórios
+                <i class="bi bi-graph-up me-2"></i> Relatórios
               </a>
             </li>
           </ul>
-          <div class="d-flex align-items-center" *ngIf="isLoggedIn">
-            <app-notificacoes class="me-3"></app-notificacoes>
-            <span class="navbar-text me-3 d-none d-sm-inline">
+          <div class="d-flex align-items-center user-section" *ngIf="isLoggedIn">
+            <app-notificacoes class="me-2"></app-notificacoes>
+            <span class="navbar-text me-2 d-none d-sm-inline user-info">
               Olá, {{ currentUser?.name || 'Usuário' }} 
               <span class="badge bg-light text-primary ms-1">{{ currentUser?.role }}</span>
             </span>
-            <button class="btn btn-outline-light px-3 py-2" (click)="logout()">
+            <button class="btn btn-outline-light logout-btn" (click)="logout()">
               <i class="bi bi-box-arrow-right d-sm-none"></i>
               <span class="d-none d-sm-inline">Sair</span>
             </button>
@@ -104,25 +107,125 @@ declare var bootstrap: any;
   styles: [`
     .navbar {
       box-shadow: 0 2px 4px rgba(0,0,0,.1);
+      padding: 0.25rem 1rem;
     }
+    
+    .navbar-brand {
+      padding-right: 0;
+      margin-right: 0.5rem;
+    }
+    
+    .nav-container {
+      margin-left: -0.5rem;
+    }
+    
     .nav-link.active {
       font-weight: bold;
       background-color: rgba(255,255,255,0.1);
       border-radius: 0.25rem;
     }
     
-    @media (max-width: 992px) {
+    /* Seção do usuário e botões no final do menu */
+    .user-section {
+      margin-left: auto;
+      white-space: nowrap;
+    }
+    
+    .user-info {
+      font-size: 0.9rem;
+      margin-right: 0.75rem !important;
+    }
+    
+    .logout-btn {
+      padding: 0.35rem 0.75rem;
+      font-size: 0.9rem;
+    }
+    
+    /* Estilização global para links de navegação */
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0.5rem 0.75rem;
+      transition: all 0.2s ease;
+      height: 100%;
+      white-space: nowrap;
+      font-size: 0.95rem;
+    }
+    
+    /* Ícones sempre visíveis e com tamanho consistente */
+    .nav-link i.bi {
+      font-size: 1.1rem;
+      opacity: 0.9;
+    }
+    
+    /* Espaçamento uniforme em todos os tamanhos de tela */
+    .navbar-nav .nav-item {
+      margin: 0 0.1rem;
+    }
+    
+    /* Estilos para telas médias e grandes (desktop) */
+    @media (min-width: 992px) {
+      .navbar-nav {
+        height: 52px; /* Altura fixa para a barra de navegação */
+      }
+      
+      .nav-item {
+        height: 100%;
+        display: flex;
+        align-items: center;
+      }
+      
+      .navbar-nav .nav-item {
+        margin: 0 0.05rem;
+      }
+      
+      .nav-link {
+        height: 38px; /* Altura fixa para todos os links */
+        padding: 0 0.65rem;
+        border-radius: 0.25rem;
+        display: flex;
+        align-items: center;
+      }
+      
+      .nav-link.active {
+        background-color: rgba(255,255,255,0.15);
+      }
+    }
+    
+    /* Estilos para telas médias */
+    @media (min-width: 992px) and (max-width: 1200px) {
+      .nav-link {
+        padding: 0 0.5rem;
+        font-size: 0.9rem;
+      }
+      
+      .nav-link i.bi {
+        font-size: 1rem;
+      }
+      
+      .navbar-brand {
+        font-size: 1.1rem;
+      }
+    }
+    
+    /* Estilos para telas pequenas (mobile) */
+    @media (max-width: 991px) {
       .nav-link {
         padding: 0.75rem 1rem;
         border-radius: 0.25rem;
         margin-bottom: 0.25rem;
+        justify-content: flex-start;
+        text-align: left;
       }
+      
       .navbar-nav {
         margin-top: 1rem;
         margin-bottom: 1rem;
+        align-items: flex-start !important;
       }
-      /* Aumentar a área de toque */
+      
       .nav-item {
+        width: 100%;
         margin-bottom: 0.5rem;
       }
       

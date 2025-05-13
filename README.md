@@ -118,7 +118,7 @@ laravel-echo-server init
 #### 3.1. Instalação das Dependências
 
 ```bash
-cd ../frontend/pesqueiro-frontend
+cd ../frontend
 npm install
 ```
 
@@ -144,7 +144,7 @@ export const environment = {
 #### 4.1. Backend
 
 ```bash
-cd ../../pesqueiro
+cd ../../backend
 php artisan serve
 # Em outro terminal
 laravel-echo-server start
@@ -153,7 +153,7 @@ laravel-echo-server start
 #### 4.2. Frontend
 
 ```bash
-cd ../frontend/pesqueiro-frontend
+cd ../frontend
 npm run start
 ```
 
@@ -174,7 +174,7 @@ Acesse o sistema em: http://localhost:4200
 Se encontrar erros de CORS, certifique-se de que o Laravel está configurado para aceitar requisições do frontend:
 
 ```php
-// pesqueiro/app/Http/Middleware/CorsMiddleware.php
+// backend/app/Http/Middleware/CorsMiddleware.php
 // Certifique-se de que o middleware esteja registrado e configurado corretamente
 ```
 
@@ -328,7 +328,7 @@ sudo npm install -g laravel-echo-server
 Configure o Laravel Echo Server:
 
 ```bash
-cd /caminho/para/seu/projeto/pesqueiro
+cd /caminho/para/seu/projeto/backend
 laravel-echo-server init
 ```
 
@@ -373,7 +373,7 @@ Com essas configurações, tanto o Redis quanto o Laravel Echo Server funcionar�
 sudo npm install -g laravel-echo-server
 
 # Inicializar Laravel Echo Server na pasta do projeto Laravel
-cd /caminho/para/projeto/pesqueiro
+cd /caminho/para/projeto/backend
 laravel-echo-server init
 ```
 
@@ -404,7 +404,7 @@ O projeto possui dois tipos de migrações:
 
 #### Sobre a Pasta 'consolidated'
 
-Na estrutura do projeto existe uma pasta chamada `/pesqueiro/database/migrations/consolidated`. Esta pasta contém as migrações originais que foram utilizadas para criar a estrutura inicial das tabelas. Essas migrações foram posteriormente separadas em arquivos individuais no diretório principal para melhorar a manutenção e evitar conflitos.
+Na estrutura do projeto existe uma pasta chamada `/backend/database/migrations/consolidated`. Esta pasta contém as migrações originais que foram utilizadas para criar a estrutura inicial das tabelas. Essas migrações foram posteriormente separadas em arquivos individuais no diretório principal para melhorar a manutenção e evitar conflitos.
 
 **Nota importante:** Você não precisa executar as migrações dentro da pasta `consolidated` diretamente, pois seus conteúdos já estão incorporados nas migrações do diretório principal. Esta pasta serve apenas como referência para a estrutura inicial do banco de dados.
 

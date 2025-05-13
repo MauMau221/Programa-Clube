@@ -1,136 +1,59 @@
-# Sistema Pesqueiro
+# PesqueiroFrontend
 
-Sistema de gerenciamento para restaurante especializado em pescados, com controle de estoque, comandas e pedidos.
+This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 19.2.10.
 
-## Estrutura do Projeto
+## Development server
 
-Este repositório contém duas partes principais:
-- `pesqueiro` - Backend desenvolvido em Laravel
-- `frontend/pesqueiro-frontend` - Frontend desenvolvido em Angular
+To start a local development server, run:
 
-## Requisitos do Sistema
-
-### Requisitos Gerais
-- Git
-- PHP 8.0 ou superior
-- Composer
-- Node.js 14 ou superior
-- npm ou yarn
-- MySQL 5.7 ou superior
-- Servidor web (Apache/Nginx)
-
-## Instalação e Configuração
-
-### 1. Clone o repositório
-```bash
-git clone https://github.com/MauMau221/Programa-Clube.git
-cd Programa-Clube
-```
-
-### 2. Configuração do Backend (Laravel)
-
-#### Instalação de dependências
-```bash
-cd pesqueiro
-composer install
-```
-
-#### Configuração do ambiente
-```bash
-cp .env.example .env
-php artisan key:generate
-```
-
-Edite o arquivo `.env` com suas configurações de banco de dados:
-```
-DB_CONNECTION=mysql
-DB_HOST=127.0.0.1
-DB_PORT=3306
-DB_DATABASE=pesqueiro
-DB_USERNAME=seu_usuario
-DB_PASSWORD=sua_senha
-```
-
-#### Migração e Seed do banco de dados
-```bash
-php artisan migrate
-php artisan db:seed
-```
-
-#### Iniciar o servidor de desenvolvimento
-```bash
-php artisan serve
-```
-O backend estará disponível em `http://localhost:8000`.
-
-### 3. Configuração do Frontend (Angular)
-
-#### Instalação de dependências
-```bash
-cd ../frontend/pesqueiro-frontend
-npm install
-```
-
-#### Configuração do ambiente
-Verifique e, se necessário, ajuste o arquivo `src/environments/environment.ts` para apontar para a API correta:
-```typescript
-export const environment = {
-  production: false,
-  apiUrl: 'http://localhost:8000/api'
-};
-```
-
-#### Iniciar o servidor de desenvolvimento
 ```bash
 ng serve
 ```
-O frontend estará disponível em `http://localhost:4200`.
 
-## Características Principais
+Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
 
-### Backend (Laravel)
-- API RESTful
-- Autenticação com Laravel Sanctum
-- Sistema de controle de estoque
-- Gerenciamento de produtos e categorias
-- Sistema de comandas e pedidos
-- Relatórios de vendas
+## Code scaffolding
 
-### Frontend (Angular)
-- Interface responsiva com Bootstrap
-- Dashboard administrativo
-- Visualização de estoque em tempo real
-- Gerenciamento de comandas
-- Interface para cozinha
-- Notificações em tempo real
+Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
 
-## Estrutura do Banco de Dados
+```bash
+ng generate component component-name
+```
 
-O sistema utiliza MySQL com as seguintes tabelas principais:
-- `users` - Usuários do sistema
-- `categorias` - Categorias de produtos
-- `produtos` - Produtos disponíveis
-- `comandas` - Comandas abertas pelos clientes
-- `comanda_itens` - Itens de cada comanda
-- `estoque_movimentos` - Histórico de movimentações de estoque
+For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
 
-## Solução de Problemas
+```bash
+ng generate --help
+```
 
-### Backend
-- Certifique-se de que as permissões de pasta estão corretas
-- Verifique os logs em `pesqueiro/storage/logs/laravel.log`
-- Problemas de banco de dados podem ser resolvidos com `php artisan migrate:fresh --seed`
+## Building
 
-### Frontend
-- Problemas de CORS: Verifique se o backend está configurado para aceitar requisições do frontend
-- Erros de autenticação: Verifique se o token está sendo armazenado corretamente
-- Para reconstruir o projeto: `npm run build`
+To build the project run:
 
-## Contribuição
+```bash
+ng build
+```
 
-Se quiser contribuir com este projeto, por favor:
-1. Faça um fork do repositório
-2. Crie uma branch para sua feature (`git checkout -b feature/nova-funcionalidade`)
-3. Commit suas mudanças (`git commit -m 'Adiciona nova funcionalidade'`)
-4. Push para a branch (`git push origin feature/nova-funcionalidade`)
-5. Abra um Pull Request 
+This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+
+## Running unit tests
+
+To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+
+```bash
+ng test
+```
+
+## Running end-to-end tests
+
+For end-to-end (e2e) testing, run:
+
+```bash
+ng e2e
+```
+
+Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+
+## Additional Resources
+
+For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

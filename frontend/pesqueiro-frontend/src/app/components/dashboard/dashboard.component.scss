@@ -319,6 +319,14 @@ $dark-gray: #343a40;
   i { color: #607d8b; }
 }
 
+/* Estilos específicos para os ícones dos cards */
+.feature-icon {
+  &.caixa i::before {
+    content: "\f242"; /* código unicode do ícone bi-cash-register */
+    font-family: "bootstrap-icons" !important;
+  }
+}
+
 // Responsividade
 @media (min-width: 992px) {
   // Estilos para telas grandes (desktop)

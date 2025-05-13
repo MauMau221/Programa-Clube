@@ -50,4 +50,47 @@
 // Estilo para o seletor de produtos
 .form-select-lg {
   background-position: right 0.75rem center;
+}
+
+/* Estilos para a página de Caixa Direto */
+
+/* Garantir que o ícone cash-register seja exibido corretamente */
+.bi-cash-register::before {
+  content: "\f242";
+  display: inline-block;
+}
+
+/* Estilização para o cabeçalho */
+h1.h2 {
+  color: #343a40;
+  font-weight: 600;
+}
+
+/* Estilos para cards */
+.card {
+  border-radius: 0.5rem;
+  transition: all 0.2s ease;
+  
+  .card-header {
+    border-radius: 0.5rem 0.5rem 0 0;
+  }
+  
+  &:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* Melhorar a visualização da tabela */
+.table {
+  th, td {
+    vertical-align: middle;
+  }
+}
+
+/* Melhorar espaçamento em dispositivos móveis */
+@media (max-width: 768px) {
+  .container-fluid {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 } 

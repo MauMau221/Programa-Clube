@@ -17,12 +17,23 @@ export class PedidoService {
   getPedidos(): Observable<Pedido[]> {
     return this.http.get<Pedido[]>(`${this.apiUrl}/pedido`).pipe(
       map(pedidos => {
-        // Garantir que todos os pedidos tenham a propriedade itens inicializada
+        // Processar cada pedido para garantir que tenha todos os dados necessários
         return pedidos.map(pedido => {
           // Inicializar itens como array vazio se não existir
           if (!pedido.itens) {
             pedido.itens = [];
           }
+          
+          // Garantir que a propriedade mesa seja definida para exibição
+          if (!pedido.mesa && pedido.comanda && pedido.comanda.mesa) {
+            pedido.mesa = pedido.comanda.mesa;
+          }
+          
+          // Garantir que a propriedade cliente seja definida se estiver na comanda
+          if (!pedido.cliente && pedido.comanda && pedido.comanda.cliente) {
+            pedido.cliente = pedido.comanda.cliente;
+          }
+          
           return pedido;
         });
       })

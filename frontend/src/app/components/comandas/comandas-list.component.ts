@@ -17,7 +17,7 @@ export class ComandasListComponent implements OnInit {
   filtroStatus: string = 'todas';
   isLoading: boolean = false;
   mensagem: string = '';
-  tipoMensagem: 'success' | 'danger' | '' = '';
+  tipoMensagem: 'success' | 'danger' | 'info' | '' = '';
 
   constructor(private comandaService: ComandaService) { }
 
@@ -89,5 +89,16 @@ export class ComandasListComponent implements OnInit {
   limparMensagem(): void {
     this.mensagem = '';
     this.tipoMensagem = '';
+  }
+
+  // Método para obter classes CSS baseadas no status da comanda
+  getStatusClass(status: string): string {
+    switch (status.toLowerCase()) {
+      case 'aberta': return 'status-aberta';
+      case 'fechada': return 'status-fechada';
+      case 'cancelada': return 'status-cancelada';
+      case 'paga': return 'status-paga';
+      default: return '';
+    }
   }
 } 

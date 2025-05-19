@@ -31,28 +31,30 @@
     </div>
 
     <!-- Cartões de Resumo -->
-    <div class="row mb-4">
-      <div class="col-md-3 col-sm-6 mb-3" *ngFor="let item of summaryItems">
-        <div class="summary-card" [ngClass]="item.bgClass">
-          <div class="summary-card-content">
-            <div class="summary-card-icon">
-              <i class="bi" [ngClass]="item.icon"></i>
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-3 mb-4">
+      <ng-container *ngFor="let item of summaryItems">
+        <div class="col" *ngIf="shouldShowSummaryItem(item)">
+          <div class="summary-card" [ngClass]="item.bgClass">
+            <div class="summary-card-content">
+              <div class="summary-card-icon">
+                <i class="bi" [ngClass]="item.icon"></i>
+              </div>
+              <div class="summary-card-info">
+                <h3 class="summary-value">
+                  <span *ngIf="!isLoading">{{item.value}}</span>
+                  <span *ngIf="isLoading" class="placeholder-glow">
+                    <span class="placeholder col-6"></span>
+                  </span>
+                </h3>
+                <p class="summary-label">{{item.label}}</p>
+              </div>
             </div>
-            <div class="summary-card-info">
-              <h3 class="summary-value">
-                <span *ngIf="!isLoading">{{item.value}}</span>
-                <span *ngIf="isLoading" class="placeholder-glow">
-                  <span class="placeholder col-6"></span>
-                </span>
-              </h3>
-              <p class="summary-label">{{item.label}}</p>
+            <div class="summary-card-footer">
+              <a [routerLink]="item.route" [queryParams]="item.queryParams" class="view-more">Ver Detalhes <i class="bi bi-arrow-right"></i></a>
             </div>
-          </div>
-          <div class="summary-card-footer">
-            <a [routerLink]="item.route" [queryParams]="item.queryParams" class="view-more">Ver Detalhes <i class="bi bi-arrow-right"></i></a>
           </div>
         </div>
-      </div>
+      </ng-container>
     </div>
     
     <!-- Acesso Rápido -->
@@ -64,17 +66,19 @@
       </div>
     </div>
     
-    <div class="row">
-      <div class="col-xl-3 col-lg-4 col-md-6 mb-4" *ngFor="let card of featureCards">
-        <div class="feature-card" *ngIf="shouldShowCard(card)">
-          <div class="feature-icon" [ngClass]="card.iconClass">
-            <i class="bi" [ngClass]="card.icon"></i>
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+      <ng-container *ngFor="let card of featureCards">
+        <div class="col" *ngIf="shouldShowCard(card)">
+          <div class="feature-card h-100">
+            <div class="feature-icon" [ngClass]="card.iconClass">
+              <i class="bi" [ngClass]="card.icon"></i>
+            </div>
+            <h3 class="feature-title">{{card.title}}</h3>
+            <p class="feature-description">{{card.description}}</p>
+            <a [routerLink]="card.route" class="btn btn-primary btn-feature">Gerenciar {{card.title}}</a>
           </div>
-          <h3 class="feature-title">{{card.title}}</h3>
-          <p class="feature-description">{{card.description}}</p>
-          <a [routerLink]="card.route" class="btn btn-primary btn-feature">Gerenciar {{card.title}}</a>
         </div>
-      </div>
+      </ng-container>
     </div>
   </div>
 </div> 

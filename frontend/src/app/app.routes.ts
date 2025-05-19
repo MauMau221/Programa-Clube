@@ -16,6 +16,8 @@ import { EstoqueHistoricoComponent } from './components/estoque/estoque-historic
 import { PedidosListComponent } from './components/pedidos/pedidos-list/pedidos-list.component';
 import { PainelClienteComponent } from './components/painel/painel-cliente.component';
 import { FuncionarioFormComponent } from './components/funcionarios/funcionario-form.component';
+import { FuncionarioListComponent } from './components/funcionarios/funcionario-list.component';
+import { FuncionarioEditComponent } from './components/funcionarios/funcionario-edit.component';
 import { PedidosKanbanComponent } from './components/pedidos/pedidos-kanban/pedidos-kanban.component';
 import { CaixaComponent } from './components/caixa/caixa.component';
 import { authGuard } from './guards/auth.guard';
@@ -42,8 +44,20 @@ export const routes: Routes = [
     component: PainelClienteComponent 
   },
   {
+    path: 'funcionarios',
+    component: FuncionarioListComponent,
+    canActivate: [authGuard],
+    canMatch: [roleGuard([ROLE_GERENTE])]
+  },
+  {
     path: 'funcionarios/novo',
     component: FuncionarioFormComponent,
+    canActivate: [authGuard],
+    canMatch: [roleGuard([ROLE_GERENTE])]
+  },
+  {
+    path: 'funcionarios/editar/:id',
+    component: FuncionarioEditComponent,
     canActivate: [authGuard],
     canMatch: [roleGuard([ROLE_GERENTE])]
   },
@@ -81,7 +95,7 @@ export const routes: Routes = [
     path: 'pedidos',
     component: PedidosListComponent,
     canActivate: [authGuard],
-    canMatch: [roleGuard([ROLE_COZINHEIRO, ROLE_GERENTE])]
+    canMatch: [roleGuard([ROLE_COZINHEIRO, ROLE_GERENTE, ROLE_GARCOM])]
   },
   {
     path: 'cozinha',

@@ -298,10 +298,11 @@ export class ComandaDetailComponent implements OnInit {
     if (!this.comanda) return;
     
     this.isLoading = true;
+    
     this.comandaService.atualizarItem(this.comanda.id, itemId, itemAtualizado).subscribe({
-      next: () => {
-        this.carregarComanda(this.comanda!.id);
+      next: (itemAtualizado) => {
         this.toastService.success('Quantidade atualizada com sucesso!');
+        this.carregarComanda(this.comanda!.id);
       },
       error: (error) => {
         console.error('Erro ao atualizar quantidade:', error);

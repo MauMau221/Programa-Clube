@@ -45,6 +45,22 @@ export class AuthService {
       );
   }
 
+  getFuncionarios(): Observable<{funcionarios: User[]}> {
+    return this.http.get<{funcionarios: User[]}>(`${this.apiUrl}/user/funcionarios`);
+  }
+
+  getFuncionario(id: number): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/user/funcionario/${id}`);
+  }
+
+  updateFuncionario(id: number, dados: Partial<User>): Observable<{message: string, user: User}> {
+    return this.http.put<{message: string, user: User}>(`${this.apiUrl}/user/funcionario/${id}`, dados);
+  }
+
+  deleteFuncionario(id: number): Observable<{message: string}> {
+    return this.http.delete<{message: string}>(`${this.apiUrl}/user/funcionario/${id}`);
+  }
+
   get isLoggedIn(): boolean {
     return !!this.getToken();
   }

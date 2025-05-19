@@ -70,4 +70,79 @@ class UserController extends Controller
         $users = User::all();
         return response()->json($users);
     }
+    
+    /**
+     * Lista todos os funcionários (exceto o usuário logado)
+     */
+    public function funcionarios(Request $request)
+    {
+        $usuarioLogado = $request->user();
+        $funcionarios = User::where('id', '!=', $usuarioLogado->id)->get();
+        
+        return response()->json([
+            'funcionarios' => $funcionarios
+        ]);
+    }
+    
+    /**
+     * Mostra os detalhes de um funcionário específico
+     */
+    public function show($id)
+    {
+        $funcionario = User::findOrFail($id);
+        return response()->json($funcionario);
+    }
+    
+    /**
+     * Atualiza os dados de um funcionário
+     */
+    public function update(Request $request, $id)
+    {
+        // Validar os dados
+        $validated = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('users')->ignore($id)
+            ],
+            'role' => 'required|in:gerente,garcom,cozinheiro'
+        ]);
+        
+        $funcionario = User::findOrFail($id);
+        
+        // Atualizar os dados
+        $funcionario->name = $validated['name'];
+        $funcionario->email = $validated['email'];
+        $funcionario->role = $validated['role'];
+        $funcionario->save();
+        
+        return response()->json([
+            'message' => 'Funcionário atualizado com sucesso',
+            'user' => $funcionario
+        ]);
+    }
+    
+    /**
+     * Remove um funcionário
+     */
+    public function destroy($id)
+    {
+        $funcionario = User::findOrFail($id);
+        
+        // Verificar se não está tentando excluir a si mesmo
+        if (Auth::id() == $id) {
+            return response()->json([
+                'message' => 'Não é possível excluir seu próprio usuário'
+            ], 403);
+        }
+        
+        $funcionario->delete();
+        
+        return response()->json([
+            'message' => 'Funcionário excluído com sucesso'
+        ]);
+    }
 } 

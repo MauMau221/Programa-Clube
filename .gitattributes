@@ -1,0 +1,40 @@
+# Define o comportamento padrão para normalização de finais de linha
+* text=auto
+
+# Arquivos de texto explícitos
+*.php text
+*.css text
+*.js text
+*.ts text
+*.html text
+*.json text
+*.md text
+*.yml text
+*.yaml text
+*.xml text
+*.sql text
+*.scss text
+*.sass text
+*.less text
+*.txt text
+
+# Arquivos que devem permanecer intactos
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.zip binary
+*.pdf binary
+*.eot binary
+*.ttf binary
+*.woff binary
+*.woff2 binary
+
+# Arquivos de configuração específicos
+*.lock text -diff
+package-lock.json text -diff
+yarn.lock text -diff
+
+# Arquivos do cache do Angular explicitamente com LF para evitar problemas
+frontend/pesqueiro-frontend/.angular/cache/** -text 

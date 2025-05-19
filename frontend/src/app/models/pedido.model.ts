@@ -25,6 +25,7 @@ export interface Pedido {
     cliente?: string;
   };
   mesa?: string;
+  cliente?: string;
   status: string;
   total: number;
   produtos: PedidoProduto[];

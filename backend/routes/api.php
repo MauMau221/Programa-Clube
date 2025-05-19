@@ -39,6 +39,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('/profile', [UserController::class, 'updateProfile']);
         Route::put('/password', [UserController::class, 'changePassword']);
         Route::get('/list', [UserController::class, 'index'])->middleware('role:gerente');
+        Route::get('/funcionarios', [UserController::class, 'funcionarios'])->middleware('role:gerente');
+        Route::get('/funcionario/{id}', [UserController::class, 'show'])->middleware('role:gerente');
+        Route::put('/funcionario/{id}', [UserController::class, 'update'])->middleware('role:gerente');
+        Route::delete('/funcionario/{id}', [UserController::class, 'destroy'])->middleware('role:gerente');
     });
 
     // Rotas para garçons e gerentes
@@ -56,6 +60,7 @@ Route::middleware('auth:sanctum')->group(function () {
             // Rotas para itens da comanda
             Route::post('/{id}/item', [ComandaItemController::class, 'store']);
             Route::delete('/{comandaId}/item/{itemId}', [ComandaItemController::class, 'destroy']);
+            Route::put('/{comandaId}/item/{itemId}', [ComandaItemController::class, 'update']);
             
             // Verificar pedidos pendentes de envio para a cozinha
             Route::get('/{comandaId}/pedidos-pendentes', [ComandaController::class, 'verificarPedidosPendentes']);

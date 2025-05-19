@@ -42,7 +42,7 @@ declare var bootstrap: any;
               </a>
             </li>
             <!-- Links para Cozinheiro e Gerente -->
-            <li class="nav-item" *ngIf="isCozinheiro || isGerente">
+            <li class="nav-item" *ngIf="isCozinheiro || isGerente || isGarcom">
               <a class="nav-link" routerLink="/pedidos" routerLinkActive="active"
                  (click)="closeMenuOnMobile()">
                 <i class="bi bi-list-check me-2"></i> Pedidos
@@ -79,6 +79,13 @@ declare var bootstrap: any;
               <a class="nav-link" routerLink="/funcionarios/novo" routerLinkActive="active"
                  (click)="closeMenuOnMobile()">
                 <i class="bi bi-person-plus me-2"></i> Cadastrar Funcionário
+              </a>
+            </li>
+            <!-- Lista de Funcionários -->
+            <li class="nav-item" *ngIf="isGerente">
+              <a class="nav-link" routerLink="/funcionarios" routerLinkActive="active"
+                 (click)="closeMenuOnMobile()">
+                <i class="bi bi-people me-2"></i> Funcionários
               </a>
             </li>
             <!-- Relatórios apenas em mobile -->

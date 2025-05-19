@@ -164,6 +164,103 @@ class ComandaItemController extends Controller
     }
 
     /**
+     * Atualizar a quantidade de um item da comanda
+     */
+    public function update(Request $request, $comandaId, $itemId)
+    {
+        // Validar dados
+        $validator = Validator::make($request->all(), [
+            'quantidade' => 'required|integer|min:1',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        // Buscar a comanda
+        $comanda = Comanda::findOrFail($comandaId);
+        
+        // Verificar se a comanda está aberta
+        if ($comanda->status !== 'aberta') {
+            return response()->json(['message' => 'Só é possível atualizar itens de comandas abertas'], 422);
+        }
+        
+        // Buscar o item dentro dos pedidos da comanda
+        $item = PedidoProduto::whereHas('pedido', function ($query) use ($comandaId) {
+            $query->where('comanda_id', $comandaId);
+        })->where('id', $itemId)->firstOrFail();
+        
+        // Buscar o produto associado ao item
+        $produto = Produto::findOrFail($item->produto_id);
+        
+        // Calcular a diferença de quantidade para atualizar o estoque
+        $diferencaQuantidade = $request->quantidade - $item->quantidade;
+        
+        // Se estamos aumentando a quantidade, verificar estoque disponível
+        if ($diferencaQuantidade > 0) {
+            if (!$this->estoqueService->verificarDisponibilidadeEstoque($produto, $diferencaQuantidade)) {
+                Log::warning('Tentativa de atualizar item com estoque insuficiente', [
+                    'produto_id' => $produto->id,
+                    'produto_nome' => $produto->nome,
+                    'estoque_atual' => $produto->estoque,
+                    'quantidade_solicitada' => $diferencaQuantidade
+                ]);
+                
+                return response()->json([
+                    'message' => "Produto {$produto->nome} está com estoque insuficiente para esta atualização!",
+                    'estoque_atual' => $produto->estoque,
+                    'quantidade_solicitada' => $diferencaQuantidade
+                ], 422);
+            }
+        }
+        
+        // Atualizar quantidade e valor total
+        $item->quantidade = $request->quantidade;
+        $item->valor_total = $item->valor_unitario * $request->quantidade;
+        $item->save();
+        
+        // Atualizar o estoque
+        try {
+            if ($diferencaQuantidade > 0) {
+                // Remover do estoque se aumentou a quantidade
+                $this->estoqueService->removerEstoque(
+                    $produto, 
+                    $diferencaQuantidade, 
+                    "Comanda #{$comandaId} - Aumento de quantidade"
+                );
+            } else if ($diferencaQuantidade < 0) {
+                // Adicionar ao estoque se diminuiu a quantidade
+                $this->estoqueService->adicionarEstoque(
+                    $produto, 
+                    abs($diferencaQuantidade), 
+                    "Comanda #{$comandaId} - Redução de quantidade"
+                );
+            }
+            
+            Log::info('Estoque atualizado para item com quantidade modificada na comanda', [
+                'comanda_id' => $comandaId,
+                'produto_id' => $produto->id,
+                'diferenca_quantidade' => $diferencaQuantidade
+            ]);
+        } catch (\Exception $estoqueException) {
+            Log::warning('Não foi possível atualizar o estoque, mas a quantidade do item foi atualizada', [
+                'erro' => $estoqueException->getMessage(),
+                'produto' => $produto->nome,
+                'comanda_id' => $comandaId
+            ]);
+            // Não interrompemos a atualização do item se houver problema no estoque
+        }
+        
+        // Atualizar o total da comanda
+        $this->atualizarTotalComanda($comandaId);
+        
+        // Carregar o produto associado para incluir na resposta
+        $item->load('produto');
+        
+        return response()->json($item);
+    }
+
+    /**
      * Remover um item da comanda
      */
     public function destroy($comandaId, $itemId)

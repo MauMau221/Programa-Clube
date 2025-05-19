@@ -12,6 +12,7 @@ interface SummaryItem {
   route: string;
   bgClass: string;
   queryParams?: any;
+  onlyForRoles?: string[];
 }
 
 interface FeatureCard {
@@ -49,7 +50,8 @@ export class DashboardComponent implements OnInit {
         dataInicio: this.formatarDataParaInput(new Date()), 
         dataFim: this.formatarDataParaInput(new Date()) 
       },
-      bgClass: 'bg-success-light'
+      bgClass: 'bg-success-light',
+      onlyForRoles: ['gerente', 'caixa']
     },
     { 
       value: '—', 
@@ -81,6 +83,14 @@ export class DashboardComponent implements OnInit {
       onlyForRoles: ['gerente']
     },
     {
+      title: 'Listar Funcionários',
+      description: 'Visualize e gerencie a lista completa de funcionários do estabelecimento.',
+      icon: 'bi-people',
+      route: '/funcionarios',
+      iconClass: 'funcionarios',
+      onlyForRoles: ['gerente']
+    },
+    {
       title: 'Cadastrar Funcionário',
       description: 'Adicione novos funcionários ao sistema com diferentes permissões.',
       icon: 'bi-person-plus',
@@ -102,7 +112,7 @@ export class DashboardComponent implements OnInit {
       icon: 'bi-cart-check',
       route: '/pedidos',
       iconClass: 'pedidos',
-      onlyForRoles: ['cozinheiro', 'gerente']
+      onlyForRoles: ['cozinheiro', 'gerente', 'garcom']
     },
     {
       title: 'Produtos',
@@ -173,6 +183,24 @@ export class DashboardComponent implements OnInit {
     
     // Verifica se o papel do usuário está na lista de papéis permitidos
     return card.onlyForRoles.includes(this.currentUserRole);
+  }
+
+  /**
+   * Verifica se um item de resumo deve ser mostrado baseado no papel do usuário
+   */
+  shouldShowSummaryItem(item: SummaryItem): boolean {
+    // Se não tem restrição de papel, mostra para todos
+    if (!item.onlyForRoles || item.onlyForRoles.length === 0) {
+      return true;
+    }
+    
+    // Se currentUserRole não estiver definido, não mostra itens com restrição
+    if (!this.currentUserRole) {
+      return false;
+    }
+    
+    // Verifica se o papel do usuário está na lista de papéis permitidos
+    return item.onlyForRoles.includes(this.currentUserRole);
   }
 
   /**

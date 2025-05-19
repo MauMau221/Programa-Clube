@@ -1,34 +1,288 @@
 .card {
   border-radius: 0.5rem;
   margin-bottom: 1.5rem;
+  transition: box-shadow 0.2s, transform 0.2s;
   
   .card-header {
     border-top-left-radius: 0.5rem;
     border-top-right-radius: 0.5rem;
   }
+  
+  &:hover {
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+  }
 }
 
 .badge {
   padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  border-radius: 2rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  font-weight: 500;
+}
+
+.status-badge {
+  &.status-aberta {
+    background-color: #198754;
+    color: white;
+  }
+  
+  &.status-cancelada {
+    background-color: #dc3545;
+    color: white;
+  }
+  
+  &.status-fechada {
+    background-color: #6c757d;
+    color: white;
+  }
+  
+  &.status-paga {
+    background-color: #0d6efd;
+    color: white;
+  }
+}
+
+.comanda-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
+  
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  .comanda-info-label {
+    color: #6c757d;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+  }
+  
+  .comanda-info-value {
+    font-size: 0.875rem;
+  }
+}
+
+.product-name {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.product-description {
+  color: #6c757d;
   font-size: 0.875rem;
 }
 
-.table {
-  th, td {
-    vertical-align: middle;
+.product-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px dashed rgba(0, 0, 0, 0.1);
+  
+  &:last-child {
+    border-bottom: none;
   }
   
-  tfoot {
-    font-size: 1.1rem;
+  .product-info-label {
+    color: #6c757d;
+    font-size: 0.875rem;
+  }
+  
+  .product-info-value {
+    font-size: 0.875rem;
   }
 }
 
-.btn-group {
-  .btn {
-    margin-right: 0.25rem;
+.comanda-item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.comanda-item {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+  padding: 1rem;
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.2s, transform 0.2s;
+  
+  &:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+  }
+  
+  .comanda-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
     
-    &:last-child {
-      margin-right: 0;
+    .comanda-item-title {
+      font-weight: 600;
     }
+    
+    .comanda-item-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      
+      .comanda-item-qty {
+        min-width: 1.5rem;
+        text-align: center;
+        font-weight: 600;
+      }
+      
+      .btn {
+        padding: 0.25rem 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+    
+    .comanda-item-badge {
+      background-color: #0d6efd;
+      color: white;
+      font-size: 0.75rem;
+      padding: 0.25rem 0.75rem;
+      border-radius: 1rem;
+      font-weight: 600;
+    }
+  }
+  
+  .comanda-item-obs {
+    font-size: 0.85rem;
+    color: #6c757d;
+    padding: 0.5rem;
+    background-color: #f8f9fa;
+    border-radius: 0.25rem;
+  }
+  
+  .comanda-item-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.75rem;
+    border-top: 1px dashed rgba(0, 0, 0, 0.1);
+  }
+}
+
+.payment-methods {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.payment-method-option {
+  flex: 1 0 auto;
+  min-width: 140px;
+  
+  .form-check-input {
+    margin-right: 0.5rem;
+  }
+  
+  .form-check-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    
+    i {
+      font-size: 1rem;
+    }
+  }
+}
+
+.payment-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.payment-item {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+  padding: 0.75rem;
+  background-color: #fff;
+  
+  .payment-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.75rem;
+  }
+  
+  .payment-item-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+}
+
+.empty-state {
+  padding: 2rem;
+  
+  i {
+    font-size: 3rem;
+    color: #dee2e6;
+  }
+}
+
+@media (max-width: 767px) {
+  .comanda-item-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    
+    button {
+      width: 100%;
+    }
+  }
+  
+  .payment-item-actions {
+    flex-direction: column;
+    
+    button {
+      width: 100%;
+    }
+  }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  .comanda-item-footer {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    
+    > div {
+      flex: 1 0 40%;
+    }
+    
+    button {
+      flex: 1 0 100%;
+    }
+  }
+}
+
+button, a.btn {
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
+  
+  &:hover {
+    transform: translateY(-2px);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+  
+  i {
+    font-size: 0.9rem;
   }
 } 

@@ -34,6 +34,11 @@ export class PedidosListComponent implements OnInit {
       }
     });
     
+    // Tentar obter a versão detalhada uma vez para depuração
+    this.pedidoService.listarPedidos().subscribe(pedidosDetalhados => {
+      console.log('Pedidos detalhados:', JSON.stringify(pedidosDetalhados[0], null, 2));
+    });
+    
     this.carregarPedidos();
     // Configurar atualização automática a cada 30 segundos
     setInterval(() => this.carregarPedidos(), 30000);
@@ -41,9 +46,25 @@ export class PedidosListComponent implements OnInit {
 
   carregarPedidos(): void {
     this.isLoading = true;
-    this.pedidoService.getPedidos().subscribe({
+    this.pedidoService.listarPedidos().subscribe({
       next: (pedidos) => {
-        this.pedidos = pedidos;
+        // Verificar a estrutura de dados do primeiro pedido (para depuração)
+        if (pedidos.length > 0) {
+          console.log('Estrutura de um pedido:', JSON.stringify(pedidos[0], null, 2));
+        }
+        
+        // Processar os pedidos para garantir que tenham a propriedade cliente
+        this.pedidos = pedidos.map(pedido => {
+          // Verificar se o pedido tem cliente (para depuração)
+          console.log(`Pedido #${pedido.id} - Mesa: ${pedido.mesa || (pedido.comanda?.mesa)} - Cliente direto: ${pedido.cliente || 'não'} - Cliente na comanda: ${pedido.comanda?.cliente || 'não'}`);
+          
+          // Se o pedido não tiver cliente direto, mas tiver na comanda, copie
+          if (!pedido.cliente && pedido.comanda && pedido.comanda.cliente) {
+            return {...pedido, cliente: pedido.comanda.cliente};
+          }
+          return pedido;
+        });
+        
         this.aplicarFiltros();
         this.isLoading = false;
       },
@@ -98,5 +119,22 @@ export class PedidosListComponent implements OnInit {
   limparMensagem(): void {
     this.mensagem = '';
     this.tipoMensagem = '';
+  }
+
+  // Método para obter o nome do cliente com segurança
+  getClienteName(pedido: Pedido): string {
+    // Para depuração
+    console.log(`Obtendo nome para pedido #${pedido.id}:`, 
+                 pedido.cliente, 
+                 pedido.comanda?.cliente);
+    
+    if (pedido.cliente) {
+      return pedido.cliente;
+    } else if (pedido.comanda && pedido.comanda.cliente) {
+      return pedido.comanda.cliente;
+    }
+    
+    // Se chegou aqui, verificar se o pedido está associado a alguma mesa com cliente
+    return 'Cliente não identificado';
   }
 }
